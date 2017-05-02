@@ -10,9 +10,9 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		GraphFrame gf = new GraphFrame("画图");
-//		Toolkit toolkit = gf.getToolkit();
-//		Image image = toolkit.getImage(GraphFrame.class.getResource("icon.png"));
-//		gf.setIconImage(image);
+		Toolkit toolkit = gf.getToolkit();
+		Image image = toolkit.getImage("resources//images//icon.png");
+		gf.setIconImage(image);
 		gf.setVisible(true);
 	}
 
