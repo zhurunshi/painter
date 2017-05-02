@@ -110,7 +110,7 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pToolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     JPanel pClipBoard = new JPanel(new GridLayout(3, 3));
     JPanel pShapeBoard = new JPanel(new GridLayout(3, 3));
-    JPanel pColorBoard = new JPanel(new GridLayout(3, 11));
+    JPanel pColorBoard = new JPanel(new GridLayout(2, 10));
 
     // 工具栏
 //    JToolBar pToolBar = new JToolBar("工具栏");
@@ -177,7 +177,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         };
 
         for(Color c : colors){
-            pColorBoard.add(new PainterButton("1", c));
+            pColorBoard.add(new PainterButton("", c));
         }
         pToolPanel.add(pColorBoard);
 
@@ -252,7 +252,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 		initMenus(); // 初始化菜单栏
 		initPopupMenu(); // 右键弹出菜单
         initToolPanel(); // 初始化工具栏
-		setSize(700,500); // 设置窗口大小
+		setSize(900,500); // 设置窗口大小
         centerWindow(); // 窗口居中函数
 		initStyle(); // 初始化风格
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置点击X按钮关闭程序

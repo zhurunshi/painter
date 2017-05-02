@@ -27,8 +27,7 @@ public class PainterButton extends JButton{
     public PainterButton(String text, Color color){
         super(text);
         setOpaque(true);
+        setBorderPainted(false);
         setBackground(color);
-        setFocusPainted(false);
-        setBounds(100, 50, 50, 25);
     }
 }
