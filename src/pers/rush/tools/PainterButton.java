@@ -26,8 +26,11 @@ public class PainterButton extends JButton{
     }
     public PainterButton(String text, Color color){
         super(text);
+        setContentAreaFilled(false); // 透明
         setOpaque(true);
         setBorderPainted(false);
         setBackground(color);
+        setPreferredSize(new Dimension(20, 20)); // 由于是GridLayout所以不能用setSize方法设置大小
+        setFocusPainted(false); // 去掉按钮文字周围的焦点框
     }
 }

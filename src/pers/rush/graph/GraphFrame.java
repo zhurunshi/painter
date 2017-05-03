@@ -110,10 +110,10 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pToolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     JPanel pClipBoard = new JPanel(new GridLayout(3, 3));
     JPanel pShapeBoard = new JPanel(new GridLayout(3, 3));
-    JPanel pColorBoard = new JPanel(new GridLayout(2, 10));
+    JPanel pToolBoard = new JPanel(new GridLayout(3, 3));
+    JPanel pColorBoard = new JPanel(new GridLayout(2, 10, 3, 3));
 
     // 工具栏
-//    JToolBar pToolBar = new JToolBar("工具栏");
     PainterButton cutButton = new PainterButton(
             new ImageIcon("resources//images//cut.png"),"剪切");
     PainterButton copyButton = new PainterButton(
@@ -124,6 +124,7 @@ public class GraphFrame extends JFrame implements ActionListener{
             new ImageIcon("resources//images//font.png"),"字体");
 
     private void initToolPanel(){
+        pPanel.setBackground(Color.WHITE);
         Container container = getContentPane();
         container.add(BorderLayout.NORTH, pToolPanel);
         pClipBoard.setBackground(Color.green);
@@ -136,6 +137,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pClipBoard.add(new JLabel(""));
         pClipBoard.add(new JLabel("剪贴板"));
         pClipBoard.add(new JLabel(""));
+        pClipBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         pToolPanel.add(pClipBoard);
 
         pShapeBoard.setBackground(Color.orange);
@@ -146,12 +148,25 @@ public class GraphFrame extends JFrame implements ActionListener{
         pShapeBoard.add(new JLabel(""));
         pShapeBoard.add(new JLabel(""));
         pShapeBoard.add(new JLabel(""));
-//        pClipBoard.add(fontButton);
         pShapeBoard.add(new JLabel("形状"));
         pShapeBoard.add(new JLabel(""));
+        pShapeBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         pToolPanel.add(pShapeBoard);
 
-//        pToolPanel.add(new JLabel("粗细"));
+        pToolBoard.setBackground(Color.CYAN);
+        pToolBoard.add(new JButton("铅笔"));
+        pToolBoard.add(fontButton);
+        pToolBoard.add(new JButton("橡皮"));
+        pToolBoard.add(new JLabel(""));
+        pToolBoard.add(new JLabel(""));
+        pToolBoard.add(new JLabel(""));
+        pToolBoard.add(new JLabel(""));
+        pToolBoard.add(new JLabel("工具"));
+        pToolBoard.add(new JLabel(""));
+        pToolPanel.add(pToolBoard);
+        pToolBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        pToolPanel.add(new PainterButton("粗细"));
 
         Color colors[] = new Color[]{
             new Color(0, 0, 0),
@@ -179,46 +194,15 @@ public class GraphFrame extends JFrame implements ActionListener{
         for(Color c : colors){
             pColorBoard.add(new PainterButton("", c));
         }
+        pColorBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         pToolPanel.add(pColorBoard);
 
-        JPanel thick = new JPanel();
-        JPanel color = new JPanel();
-
-//        pToolBar.add(cutButton);
-//        pToolBar.add(copyButton);
-//        pToolBar.add(pasteButton);
-//        pToolBar.addSeparator();
-        JPanel shape = new JPanel();
-        shape.setBackground(Color.green);
-//        pToolBar.add(shape, new GridLayout(2,3));
-        String str1[] = {"直线", "矩形", "圆", "1", "2", "3"};
-        JButton btn1[] = new JButton[str1.length];
-        for(int i = 0; i < str1.length; ++i){
-            btn1[i] = new JButton(str1[i]);
-            shape.add(btn1[i]);
-        }
-//        pToolBar.addSeparator();
-        JPanel tool = new JPanel();
-        tool.setBackground(Color.orange);
-//        pToolBar.add(tool, new GridLayout(3,1,0,0));
-        String str2[] = {"铅笔", "文字", "橡皮"};
-        JButton btn2[] = new JButton[str2.length];
-        for(int i = 0; i < str2.length; ++i){
-            btn2[i] = new JButton(str2[i]);
-            tool.add(btn2[i]);
-        }
-//        pToolBar.add(tool);
-//        pToolBar.addSeparator();
-//        pToolBar.add(thick);
-//        pToolBar.add(color);
-//        pToolBar.add(fontButton);
+        pToolPanel.add(new PainterButton("更多颜色"));
 
         cutButton.addActionListener(this);
         copyButton.addActionListener(this);
         pasteButton.addActionListener(this);
         fontButton.addActionListener(this);
-
-//        pToolBar.setFloatable(false);
     }
 	
 	// 默认为Windows风格
@@ -252,7 +236,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 		initMenus(); // 初始化菜单栏
 		initPopupMenu(); // 右键弹出菜单
         initToolPanel(); // 初始化工具栏
-		setSize(900,500); // 设置窗口大小
+		setSize(1100,600); // 设置窗口大小
         centerWindow(); // 窗口居中函数
 		initStyle(); // 初始化风格
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置点击X按钮关闭程序
