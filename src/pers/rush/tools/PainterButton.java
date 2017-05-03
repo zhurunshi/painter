@@ -16,9 +16,12 @@ public class PainterButton extends JButton{
     public PainterButton(Icon icon, String toolTipText){
         super(icon);
         setToolTipText(toolTipText);
+        setContentAreaFilled(false);
+        setFocusPainted(false); // 去掉按钮文字周围的焦点框
     }
     public PainterButton(String text){
         super(text);
+        setContentAreaFilled(false);
     }
     public PainterButton(String text, Icon icon, String toolTipText){
         super(text, icon);

@@ -4,8 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import pers.rush.tools.PainterButton;
+import pers.rush.tools.PainterLabel;
 import pers.rush.tools.PainterMenu;
 
 public class GraphFrame extends JFrame implements ActionListener{
@@ -16,6 +19,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 	JMenuItem pNew = new JMenuItem("新建(N)", KeyEvent.VK_N);
 	JMenuItem pOpen = new JMenuItem("打开(O)", KeyEvent.VK_O);
 	JMenuItem pSave = new JMenuItem("保存(S)", KeyEvent.VK_S);
+    JMenuItem pBgColor=new JMenuItem("背景颜色(B)...",KeyEvent.VK_C);
 	JMenuItem pExit = new JMenuItem("退出(X)", KeyEvent.VK_X);
 	// 帮助菜单
 	PainterMenu pHelpMenu = new PainterMenu("帮助(H)", KeyEvent.VK_H);
@@ -28,6 +32,8 @@ public class GraphFrame extends JFrame implements ActionListener{
 		pFileMenu.add(pNew);
 		pFileMenu.add(pOpen);
 		pFileMenu.add(pSave);
+        pFileMenu.addSeparator();
+        pFileMenu.add(pBgColor);
 		pFileMenu.addSeparator();
 		pFileMenu.add(pExit);
 		pMenuBar.add(pFileMenu); // 将文件菜单添加到菜单栏
@@ -35,6 +41,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pNew.addActionListener(this);
         pOpen.addActionListener(this);
         pSave.addActionListener(this);
+        pBgColor.addActionListener(this);
         pExit.addActionListener(this);
 		// 添加图标
 		ImageIcon newIcon = new ImageIcon("resources//images//new.png");
@@ -47,12 +54,17 @@ public class GraphFrame extends JFrame implements ActionListener{
 		pNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK));
 		pOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK));
 		pSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK));
+        pBgColor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,InputEvent.CTRL_DOWN_MASK));
 		pExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,InputEvent.ALT_DOWN_MASK));
 
         // 添加帮助菜单
         pHelpMenu.add(pHelp);
         pHelpMenu.add(pAbout);
         pMenuBar.add(pHelpMenu); // 将帮助菜单添加到菜单栏
+
+        // 注册监听
+        pHelpMenu.addActionListener(this);
+        pAbout.addActionListener(this);
 	}
 
     // 用JPanel作画布
@@ -92,6 +104,13 @@ public class GraphFrame extends JFrame implements ActionListener{
         pCopy.setIcon(copyIcon);
         ImageIcon pasteIcon = new ImageIcon("resources//images//paste.png");
         pPaste.setIcon(pasteIcon);
+        // 注册监听
+        pUndo.addActionListener(this);
+        pRedo.addActionListener(this);
+        pCut.addActionListener(this);
+        pCopy.addActionListener(this);
+        pPaste.addActionListener(this);
+        pSelectAll.addActionListener(this);
 
         add(pPanel); // 将画布添加到JFrame
         pPanel.add(pPopupMenu); // 将右键菜单添加到画布
@@ -108,10 +127,16 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 工具栏（不用ToolBar实现）
     JPanel pToolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    JPanel pClipBoard = new JPanel(new GridLayout(3, 3));
-    JPanel pShapeBoard = new JPanel(new GridLayout(3, 3));
-    JPanel pToolBoard = new JPanel(new GridLayout(3, 3));
-    JPanel pColorBoard = new JPanel(new GridLayout(2, 10, 3, 3));
+    JPanel pClipBoard = new JPanel(new BorderLayout());
+    JPanel pClipButtons = new JPanel(new GridLayout(1, 3));
+    JPanel pShapeBoard = new JPanel(new BorderLayout());
+    JPanel pShapeButtons = new JPanel(new GridLayout(1, 3));
+    JPanel pToolBoard = new JPanel(new BorderLayout());
+    JPanel pToolButtons = new JPanel(new GridLayout(1, 3));
+    JPanel pWidthBoard = new JPanel(new BorderLayout());
+    JPanel pWidthButtons = new JPanel(new GridLayout(1, 1));
+    JPanel pColorBoard = new JPanel(new BorderLayout());
+    JPanel pColorButtons = new JPanel(new GridLayout(2, 10, 3, 3));
 
     // 工具栏
     PainterButton cutButton = new PainterButton(
@@ -120,53 +145,88 @@ public class GraphFrame extends JFrame implements ActionListener{
             new ImageIcon("resources//images//copy.png"),"复制");
     PainterButton pasteButton = new PainterButton(
             new ImageIcon("resources//images//paste.png"),"粘贴");
+    PainterButton lineButton = new PainterButton(
+            new ImageIcon("resources//images//line.png"),"直线");
+    PainterButton rectangleButton = new PainterButton(
+            new ImageIcon("resources//images//rectangle.png"),"矩形");
+    PainterButton ovalButton = new PainterButton(
+            new ImageIcon("resources//images//oval.png"),"椭圆形");
+    PainterButton pencilButton = new PainterButton(
+            new ImageIcon("resources//images//pencil.png"),"铅笔");
+    PainterButton eraserButton = new PainterButton(
+            new ImageIcon("resources//images//eraser.png"),"橡皮擦");
     PainterButton fontButton = new PainterButton(
-            new ImageIcon("resources//images//font.png"),"字体");
+            new ImageIcon("resources//images//font.png"),"文本");
+    PainterButton widthButton = new PainterButton(
+            new ImageIcon("resources//images//width.png"),"粗细");
+    PainterButton colorButton = new PainterButton(
+            new ImageIcon("resources//images//color_32px.png"),"更多颜色");
+
+    // 工具栏背景色
+    Color ToolPanelBgColor = new Color(223, 223, 245);
+    // 当前画笔颜色
+    Color currentColor;
+    // 背景颜色
+    Color bgColor;
 
     private void initToolPanel(){
+        // 注册监听
+        cutButton.addActionListener(this);
+        copyButton.addActionListener(this);
+        pasteButton.addActionListener(this);
+        lineButton.addActionListener(this);
+        rectangleButton.addActionListener(this);
+        ovalButton.addActionListener(this);
+        pencilButton.addActionListener(this);
+        eraserButton.addActionListener(this);
+        fontButton.addActionListener(this);
+        widthButton.addActionListener(this);
+        colorButton.addActionListener(this);
+
         pPanel.setBackground(Color.WHITE);
         Container container = getContentPane();
         container.add(BorderLayout.NORTH, pToolPanel);
-        pClipBoard.setBackground(Color.green);
-        pClipBoard.add(cutButton);
-        pClipBoard.add(copyButton);
-        pClipBoard.add(pasteButton);
-        pClipBoard.add(new JLabel(""));
-        pClipBoard.add(new JLabel(""));
-        pClipBoard.add(new JLabel(""));
-        pClipBoard.add(new JLabel(""));
-        pClipBoard.add(new JLabel("剪贴板"));
-        pClipBoard.add(new JLabel(""));
-        pClipBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        pToolPanel.setBackground(ToolPanelBgColor);
+        pClipButtons.add(cutButton);
+        pClipButtons.add(copyButton);
+        pClipButtons.add(pasteButton);
+        pClipButtons.setBackground(ToolPanelBgColor);
+        pClipBoard.add(pClipButtons, BorderLayout.NORTH);
+        pClipBoard.add(new PainterLabel("　", JLabel.CENTER), BorderLayout.CENTER);
+        pClipBoard.add(new PainterLabel("剪贴板", JLabel.CENTER), BorderLayout.SOUTH);
+        pClipBoard.setBorder(BorderFactory.createEtchedBorder ());
+        pClipBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pClipBoard);
 
-        pShapeBoard.setBackground(Color.orange);
-        pShapeBoard.add(new JButton("直线"));
-        pShapeBoard.add(new JButton("矩形"));
-        pShapeBoard.add(new JButton("圆形"));
-        pShapeBoard.add(new JLabel(""));
-        pShapeBoard.add(new JLabel(""));
-        pShapeBoard.add(new JLabel(""));
-        pShapeBoard.add(new JLabel(""));
-        pShapeBoard.add(new JLabel("形状"));
-        pShapeBoard.add(new JLabel(""));
-        pShapeBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        pShapeButtons.add(lineButton);
+        pShapeButtons.add(rectangleButton);
+        pShapeButtons.add(ovalButton);
+        pShapeButtons.setBackground(ToolPanelBgColor);
+        pShapeBoard.add(pShapeButtons, BorderLayout.NORTH);
+        pShapeBoard.add(new PainterLabel("　", JLabel.CENTER), BorderLayout.CENTER);
+        pShapeBoard.add(new PainterLabel("形状", JLabel.CENTER), BorderLayout.SOUTH);
+        pShapeBoard.setBorder(BorderFactory.createEtchedBorder ());
+        pShapeBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pShapeBoard);
 
-        pToolBoard.setBackground(Color.CYAN);
-        pToolBoard.add(new JButton("铅笔"));
-        pToolBoard.add(fontButton);
-        pToolBoard.add(new JButton("橡皮"));
-        pToolBoard.add(new JLabel(""));
-        pToolBoard.add(new JLabel(""));
-        pToolBoard.add(new JLabel(""));
-        pToolBoard.add(new JLabel(""));
-        pToolBoard.add(new JLabel("工具"));
-        pToolBoard.add(new JLabel(""));
+        pToolButtons.add(pencilButton);
+        pToolButtons.add(fontButton);
+        pToolButtons.add(eraserButton);
+        pToolButtons.setBackground(ToolPanelBgColor);
+        pToolBoard.add(pToolButtons, BorderLayout.NORTH);
+        pToolBoard.add(new PainterLabel("　", JLabel.CENTER), BorderLayout.CENTER);
+        pToolBoard.add(new PainterLabel("工具", JLabel.CENTER), BorderLayout.SOUTH);
+        pToolBoard.setBorder(BorderFactory.createEtchedBorder ());
+        pToolBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pToolBoard);
-        pToolBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        pToolPanel.add(new PainterButton("粗细"));
+        pWidthButtons.add(widthButton);
+        pWidthButtons.setBackground(ToolPanelBgColor);
+        pWidthBoard.add(pWidthButtons, BorderLayout.NORTH);
+        pWidthBoard.add(new PainterLabel("粗细", JLabel.CENTER), BorderLayout.SOUTH);
+        pWidthBoard.setBorder(BorderFactory.createEtchedBorder ());
+        pWidthBoard.setBackground(ToolPanelBgColor);
+        pToolPanel.add(pWidthBoard);
 
         Color colors[] = new Color[]{
             new Color(0, 0, 0),
@@ -192,18 +252,35 @@ public class GraphFrame extends JFrame implements ActionListener{
         };
 
         for(Color c : colors){
-            pColorBoard.add(new PainterButton("", c));
+            pColorButtons.add(new PainterButton("", c));
         }
-        pColorBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        pColorButtons.setBackground(ToolPanelBgColor);
+        pColorBoard.add(pColorButtons, BorderLayout.WEST);
+        pColorBoard.add(colorButton, BorderLayout.EAST);
+        pColorBoard.add(new PainterLabel("颜色", JLabel.CENTER), BorderLayout.SOUTH);
+        pColorBoard.setBorder(BorderFactory.createEtchedBorder ());
+        pColorBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pColorBoard);
-
-        pToolPanel.add(new PainterButton("更多颜色"));
 
         cutButton.addActionListener(this);
         copyButton.addActionListener(this);
         pasteButton.addActionListener(this);
         fontButton.addActionListener(this);
     }
+
+    // 显示坐标栏
+    JToolBar pToolBar = new JToolBar("坐标栏");
+    JLabel pPosition = new JLabel("");
+    JLabel pDimension = new JLabel("像素");
+    private void initToolBar(){
+        Container c = getContentPane();
+        c.add(BorderLayout.SOUTH, pToolBar);
+        pToolBar.add(pPosition);
+        pToolBar.addSeparator();
+        pToolBar.add(pDimension);
+        pToolBar.setFloatable(false);
+    }
+
 	
 	// 默认为Windows风格
 	private void initStyle(){
@@ -236,6 +313,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 		initMenus(); // 初始化菜单栏
 		initPopupMenu(); // 右键弹出菜单
         initToolPanel(); // 初始化工具栏
+        initToolBar(); // 初始化坐标栏
 		setSize(1100,600); // 设置窗口大小
         centerWindow(); // 窗口居中函数
 		initStyle(); // 初始化风格
@@ -249,78 +327,141 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == pNew){
-            New();
+            newFile();
         }
         else if(e.getSource() == pOpen){
-            Open();
+            open();
         }
         else if(e.getSource() == pSave){
-            Save();
+            save();
+        }
+        else if(e.getSource() == pBgColor){
+            setBgColor();
         }
         else if(e.getSource() == pExit){
-            Exit();
+            exit();
         }
         else if(e.getSource() == pHelp){
-            Help();
+            help();
         }
         else if(e.getSource() == pAbout){
-            About();
+            about();
         }
         else if(e.getSource() == pUndo){
-            Undo();
+            undo();
         }
         else if(e.getSource() == pRedo){
-            Redo();
+            redo();
         }
-        else if(e.getSource() == pCut){
-            Cut();
+        else if(e.getSource() == pCut || e.getSource() == cutButton){
+            cut();
         }
-        else if(e.getSource() == pCopy){
-            Copy();
+        else if(e.getSource() == pCopy || e.getSource() == copyButton){
+            copy();
         }
-        else if(e.getSource() == pPaste){
-            Paste();
+        else if(e.getSource() == pPaste || e.getSource() == pasteButton){
+            paste();
         }
         else if(e.getSource() == pSelectAll){
-            SelectAll();
+            selectAll();
+        }
+        else if(e.getSource() == lineButton){
+            line();
+        }
+        else if(e.getSource() == rectangleButton){
+            rectangle();
+        }
+        else if(e.getSource() == ovalButton){
+            oval();
+        }
+        else if(e.getSource() == pencilButton){
+            pencil();
+        }
+        else if(e.getSource() == fontButton){
+            font();
+        }
+        else if(e.getSource() == eraserButton){
+            eraser();
+        }
+        else if(e.getSource() == widthButton){
+            setWidth();
+        }
+        else if(e.getSource() == colorButton){
+            setColor();
         }
     }
 
-    private void SelectAll() {
+    private void setColor() {
+        Color tmpColor = JColorChooser.showDialog(this, "编辑颜色", pPanel.getBackground());
+        if(tmpColor != null){
+            currentColor = tmpColor;
+        }
     }
 
-    private void Paste() {
+    private void setWidth() {
     }
 
-    private void Copy() {
+    private void eraser() {
     }
 
-    private void Cut() {
+    private void font() {
     }
 
-    private void Redo() {
+    private void pencil() {
     }
 
-    private void Undo() {
+    private void oval() {
     }
 
-    private void About() {
+    private void rectangle() {
     }
 
-    private void Help() {
+    private void line() {
     }
 
-    private void Exit() {
+    private void selectAll() {
+    }
+
+    private void paste() {
+    }
+
+    private void copy() {
+    }
+
+    private void cut() {
+    }
+
+    private void redo() {
+    }
+
+    private void undo() {
+    }
+
+    private void about() {
+    }
+
+    private void help() {
+    }
+
+    private void exit() {
         System.exit(0);
     }
 
-    private void Save() {
+    private void setBgColor() {
+        Color tmpColor = JColorChooser.showDialog(this, "背景颜色", pPanel.getBackground());
+        if(tmpColor != null){
+            bgColor = tmpColor;
+            pPanel.setBackground(bgColor);
+        }
     }
 
-    private void Open() {
+    private void save() {
     }
 
-    private void New() {
+    private void open() {
+    }
+
+    private void newFile() {
     }
 
     public static void main(String[] args) {
