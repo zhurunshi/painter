@@ -1,7 +1,5 @@
 package pers.rush.model;
 
-import pers.rush.model.impl.Shape;
-
 import java.awt.*;
 
 /**

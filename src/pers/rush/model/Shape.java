@@ -1,4 +1,4 @@
-package pers.rush.model.impl;
+package pers.rush.model;
 
 import java.awt.*;
 
