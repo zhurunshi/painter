@@ -21,7 +21,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
     public int x1, y1, x2, y2, ox, oy, x3, y3;
     public ButtonGroup bg;
     public String command;
-    public Color color;
+    public Color color; // 画笔颜色
     public GraphFrame gf;
     public ArrayList list;
     public boolean flag = true;
@@ -65,6 +65,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
     public void mouseReleased(MouseEvent e) {
         x2 = e.getX();
         y2 = e.getY();
+        System.out.println("command: " + command);
         if("cut".equals(command)){ }
         else if("copy".equals(command)){ }
         else if("paste".equals(command)){ }
@@ -94,7 +95,9 @@ public class DrawListener implements MouseListener, MouseMotionListener{
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        color = gf.currentColor;
+        g.setColor(color);
+        g.setStroke(s1);
     }
 
     @Override
@@ -114,8 +117,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
             y1 = y;
         }
         else if("eraser".equals(command)){
-            gf.bgColor = Color.WHITE;
-            g.setColor(gf.bgColor);
+            g.setColor(Color.WHITE);
             g.setStroke(s3);
 
             Shape line = new Line(x1, y1, x, y,g.getColor(),15);
