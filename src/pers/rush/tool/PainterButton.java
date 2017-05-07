@@ -1,4 +1,4 @@
-package pers.rush.tools;
+package pers.rush.tool;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,8 +29,8 @@ public class PainterButton extends JRadioButton {
     }
     public PainterButton(String text, Color color){
         super(text);
-//        setContentAreaFilled(false); // 透明
-//        setOpaque(true);
+        setContentAreaFilled(false); // 透明
+        setOpaque(true);
 //        setBorderPainted(false);
         setBackground(color);
 //        setPreferredSize(new Dimension(20, 20)); // 由于是GridLayout所以不能用setSize方法设置大小

@@ -3,13 +3,16 @@ package pers.rush.graph;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Stack;
+
 
 import javax.swing.*;
 
 import pers.rush.model.Shape;
-import pers.rush.tools.PainterButton;
-import pers.rush.tools.PainterLabel;
-import pers.rush.tools.PainterMenu;
+import pers.rush.tool.PainterButton;
+import pers.rush.tool.PainterLabel;
+import pers.rush.tool.PainterMenu;
+import pers.rush.tool.Text;
 
 public class GraphFrame extends JFrame implements ActionListener{
 	// 菜单栏
@@ -66,17 +69,28 @@ public class GraphFrame extends JFrame implements ActionListener{
         pHelpMenu.addActionListener(this);
         pAbout.addActionListener(this);
 	}
-
-    ArrayList list = new ArrayList();
+	// 放图形的容器
+    ArrayList graphicsList = new ArrayList();
+    // 放文字的容器
+    ArrayList textList = new ArrayList();
+    // 放恢复图形的容器
+    Stack redoStack = new Stack();
+    // 是否全选变量
+    boolean selectAll = false;
     // 用JPanel作画布
     JPanel pPanel = new JPanel(){
         public void paint(Graphics g){
             Graphics2D g2d = (Graphics2D)g;
             super.paint(g);
-            for(int i = 0; i < list.size(); ++i){
-                Shape shape = (Shape)list.get(i);
-                shape.Draw(g2d);
+            for(int i = 0; i < graphicsList.size(); ++i){
+                Shape shape = (Shape)graphicsList.get(i);
+                shape.draw(g2d);
             }
+            for(int i = 0; i < textList.size(); ++i){
+            	Text t = (Text)textList.get(i);
+            	g2d.drawString(t.getContent(), t.getX(), t.getY());
+            }
+            repaint();
         }
     };
 
@@ -85,8 +99,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         this.setVisible(true);
         pPanel.setBackground(Color.WHITE);
         Graphics g = pPanel.getGraphics();
-        DrawListener dl = new DrawListener(g, bg, this, list);
-        lineButton.setSelected(true);
+        DrawListener dl = new DrawListener(g, bg, this, graphicsList, textList);
+        pencilButton.setSelected(true);
         pPanel.addMouseListener(dl);
         pPanel.addMouseMotionListener(dl);
     }
@@ -154,10 +168,11 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pToolBoard = new JPanel(new BorderLayout());
     JPanel pToolButtons = new JPanel(new GridLayout(1, 3));
     JPanel pWidthBoard = new JPanel(new BorderLayout());
-    JPanel pWidthButtons = new JPanel(new GridLayout(1, 1));
+    JPanel pWidthButtons = new JPanel(new GridLayout(3, 1));
     JPanel pColorBoard = new JPanel(new BorderLayout());
     JPanel pColorButtons = new JPanel(new GridLayout(2, 10, 3, 3));
 
+    // 按钮组
     ButtonGroup bg = new ButtonGroup();
 
     // 工具栏
@@ -173,62 +188,42 @@ public class GraphFrame extends JFrame implements ActionListener{
             new ImageIcon("resources//images//rectangle.png"), "矩形");
     PainterButton ovalButton = new PainterButton(
             new ImageIcon("resources//images//oval.png"), "椭圆形");
+    ImageIcon pencilIcon = new ImageIcon("resources//images//pencil.png");
     PainterButton pencilButton = new PainterButton(
-            new ImageIcon("resources//images//pencil.png"), "铅笔");
+            pencilIcon, "铅笔");
+    ImageIcon eraserIcon = new ImageIcon("resources//images//eraser.png");
     PainterButton eraserButton = new PainterButton(
-            new ImageIcon("resources//images//eraser.png"), "橡皮擦");
+            eraserIcon, "橡皮擦");
     PainterButton fontButton = new PainterButton(
             new ImageIcon("resources//images//font.png"), "文本");
-    PainterButton widthButton = new PainterButton(
-            new ImageIcon("resources//images//width.png"), "粗细");
+    PainterButton smallWidthButton = new PainterButton(
+    		new ImageIcon("resources//images//small.png"), "小");
+    PainterButton medianWidthButton = new PainterButton(
+    		new ImageIcon("resources//images//median.png"), "中");
+    PainterButton largeWidthButton = new PainterButton(
+    		new ImageIcon("resources//images//large.png"), "大");
+//    PainterButton widthButton = new PainterButton(
+//            new ImageIcon("resources//images//width.png"), "粗细");
     PainterButton colorButton = new PainterButton(
             new ImageIcon("resources//images//color_32px.png"), "更多颜色");
 
-    // 粗细菜单
-    JPopupMenu pWidthMenu = new JPopupMenu();
-    JMenuItem pSmall = new JMenuItem("小");
-    JMenuItem pMedian = new JMenuItem("中等");
-    JMenuItem pLarge = new JMenuItem("大");
-
     private void initWidthMenu(){
-        pWidthMenu.add(pSmall);
-        pWidthMenu.add(pMedian);
-        pWidthMenu.add(pLarge);
+        pWidthButtons.add(smallWidthButton);
+        pWidthButtons.add(medianWidthButton);
+        pWidthButtons.add(largeWidthButton);
 
         // 快捷键
 //        pSmall.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
 //        pMedian.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,InputEvent.CTRL_DOWN_MASK));
 //        pLarge.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,InputEvent.CTRL_DOWN_MASK));
-
-        // 添加图标
-        ImageIcon undoIcon = new ImageIcon("resources//images//undo.png");
-        pSmall.setIcon(undoIcon);
-        ImageIcon redoIcon = new ImageIcon("resources//images//redo.png");
-        pMedian.setIcon(redoIcon);
-        ImageIcon cutIcon = new ImageIcon("resources//images//cut.png");
-        pLarge.setIcon(cutIcon);
-
-        // 注册监听
-        pSmall.addActionListener(this);
-        pMedian.addActionListener(this);
-        pLarge.addActionListener(this);
-
-        pToolPanel.add(pWidthMenu); // 将右键菜单添加到画布
-        pPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                int mods = e.getModifiers();
-                if((mods & InputEvent.BUTTON3_MASK) != 0){ // 点击右键
-                    pRightClickMenu.show(pPanel,e.getX(),e.getY()); // 弹出菜单
-                }
-            }
-        });
     }
 
     // 工具栏背景色
     Color ToolPanelBgColor = new Color(223, 223, 245);
     // 当前画笔颜色
     Color currentColor = Color.BLACK;
+    // 当前画笔粗细
+    Stroke s = new BasicStroke(1);
     // 背景颜色
     Color bgColor;
 
@@ -243,7 +238,9 @@ public class GraphFrame extends JFrame implements ActionListener{
         pencilButton.addActionListener(this);
         eraserButton.addActionListener(this);
         fontButton.addActionListener(this);
-        widthButton.addActionListener(this);
+        smallWidthButton.addActionListener(this);
+        medianWidthButton.addActionListener(this);
+        largeWidthButton.addActionListener(this);
         colorButton.addActionListener(this);
 
         bg.add(cutButton);
@@ -255,8 +252,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         bg.add(pencilButton);
         bg.add(eraserButton);
         bg.add(fontButton);
-        bg.add(widthButton);
-        bg.add(colorButton);
 
         cutButton.setActionCommand("cut");
         copyButton.setActionCommand("copy");
@@ -267,7 +262,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         pencilButton.setActionCommand("pencil");
         eraserButton.setActionCommand("eraser");
         fontButton.setActionCommand("font");
-        widthButton.setActionCommand("width");
         colorButton.setActionCommand("color");
 
         Container container = getContentPane();
@@ -306,7 +300,9 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pToolBoard);
 
-        pWidthButtons.add(widthButton);
+        pWidthButtons.add(smallWidthButton);
+        pWidthButtons.add(medianWidthButton);
+        pWidthButtons.add(largeWidthButton);
         pWidthButtons.setBackground(ToolPanelBgColor);
         pWidthBoard.add(pWidthButtons, BorderLayout.NORTH);
         pWidthBoard.add(new PainterLabel("粗细", JLabel.CENTER), BorderLayout.SOUTH);
@@ -314,6 +310,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         pWidthBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pWidthBoard);
 
+        ButtonGroup cg = new ButtonGroup();
+        
         Color colors[] = new Color[]{
             new Color(0, 0, 0),
             new Color(127, 127, 127),
@@ -345,7 +343,15 @@ public class GraphFrame extends JFrame implements ActionListener{
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    currentColor = c;
+                	if(selectAll){
+        				for(int i = 0; i < graphicsList.size(); ++i){
+        	    			Shape s = (Shape)graphicsList.get(i);
+        	    			s.color = c;
+        	    		}
+        			}
+                	else{
+                		currentColor = c;
+                	}
                 }
 
                 @Override
@@ -358,7 +364,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                 public void mouseExited(MouseEvent e) {}
             });
             pColorButtons.add(colorButton);
-            bg.add(colorButton);
+            cg.add(colorButton);
         }
         pColorButtons.setBackground(ToolPanelBgColor);
         pColorBoard.add(pColorButtons, BorderLayout.WEST);
@@ -386,7 +392,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolBar.add(pDimension);
         pToolBar.setFloatable(false);
     }
-
 	
 	// 默认为Windows风格
 	private void initStyle(){
@@ -419,6 +424,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 		initMenus(); // 初始化菜单栏
         initpPanel(); // 初始化画布
 		initRightClickMenu(); // 右键弹出菜单
+		initWidthMenu(); // 粗细选择菜单
         initToolPanel(); // 初始化工具栏
         initToolBar(); // 初始化坐标栏
 		setSize(1100,600); // 设置窗口大小
@@ -490,8 +496,41 @@ public class GraphFrame extends JFrame implements ActionListener{
         else if(e.getSource() == eraserButton){
             eraser();
         }
-        else if(e.getSource() == widthButton){
-            setWidth();
+        else if(e.getSource() == largeWidthButton){
+        	Stroke selectedStroke = new BasicStroke(10);
+        	if(selectAll){
+				for(int i = 0; i < graphicsList.size(); ++i){
+	    			Shape s = (Shape)graphicsList.get(i);
+	    			s.stroke = selectedStroke;
+	    		}
+			}
+        	else{
+        		s = selectedStroke;
+        	}
+        }
+        else if(e.getSource() == medianWidthButton){
+        	Stroke selectedStroke = new BasicStroke(5);
+        	if(selectAll){
+				for(int i = 0; i < graphicsList.size(); ++i){
+	    			Shape s = (Shape)graphicsList.get(i);
+	    			s.stroke = selectedStroke;
+	    		}
+			}
+        	else{
+        		s = selectedStroke;
+        	}
+        }
+        else if(e.getSource() == smallWidthButton){
+        	Stroke selectedStroke = new BasicStroke(1);
+        	if(selectAll){
+				for(int i = 0; i < graphicsList.size(); ++i){
+	    			Shape s = (Shape)graphicsList.get(i);
+	    			s.stroke = selectedStroke;
+	    		}
+			}
+        	else{
+        		s = selectedStroke;
+        	}
         }
         else if(e.getSource() == colorButton){
             setColor();
@@ -499,43 +538,55 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void setColor() {
-        Color tmpColor = JColorChooser.showDialog(this, "编辑颜色", pPanel.getBackground());
-        if(tmpColor != null){
-            currentColor = tmpColor;
+		Color tmpColor = JColorChooser.showDialog(this, "编辑颜色", pPanel.getBackground());
+		if(tmpColor != null){
+			if(selectAll){
+				for(int i = 0; i < graphicsList.size(); ++i){
+	    			Shape s = (Shape)graphicsList.get(i);
+	    			s.color = tmpColor;
+	    		}
+			}
+			else{
+				currentColor = tmpColor;
+			}
         }
     }
 
-    private void setWidth() {
-    }
-
     private void eraser() {
+    	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+    			eraserIcon.getImage(), new Point(10, 10), "eraser");
+    	setCursor(eraserCursor);
     }
 
     private void font() {
+    	Cursor inputCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+    			new ImageIcon("resources//images//input.png").getImage(), new Point(10, 10), "eraser");
+    	setCursor(inputCursor);
     }
 
     private void pencil() {
+    	Cursor pencilCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+    			pencilIcon.getImage(), new Point(10, 10), "pencil");
+    	setCursor(pencilCursor);
     }
 
     private void oval() {
-        System.out.println("press oval");
         bg.clearSelection();
         ovalButton.setSelected(true);
     }
 
     private void rectangle() {
-        System.out.println("press rectangle");
         bg.clearSelection();
         rectangleButton.setSelected(true);
     }
 
     private void line() {
-        System.out.println("press line");
         bg.clearSelection();
         lineButton.setSelected(true);
     }
 
     private void selectAll() {
+    	selectAll = !selectAll;
     }
 
     private void paste() {
@@ -548,9 +599,21 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void redo() {
+    	if(!redoStack.empty()){
+    		Shape s = (Shape)redoStack.pop(); // 删除栈顶元素并返回栈顶元素
+        	if(s != null){
+        		graphicsList.add(s);
+        	}
+    	}
     }
 
     private void undo() {
+    	int index = graphicsList.size() - 1;
+    	if(index >= 0){
+    		Shape s = (Shape)graphicsList.get(index);
+    		graphicsList.remove(index); 
+    		redoStack.push(s);
+    	}
     }
 
     private void about() {
@@ -572,6 +635,9 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void save() {
+    	if( !(graphicsList.isEmpty() && textList.isEmpty()) ){
+    		
+    	}
     }
 
     private void open() {
@@ -579,10 +645,5 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     private void newFile() {
     }
-
-    public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

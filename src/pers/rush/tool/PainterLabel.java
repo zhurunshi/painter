@@ -1,4 +1,4 @@
-package pers.rush.tools;
+package pers.rush.tool;
 
 import javax.swing.*;
 import java.awt.*;
