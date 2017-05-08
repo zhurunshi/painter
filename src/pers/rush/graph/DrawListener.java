@@ -1,6 +1,7 @@
 package pers.rush.graph;
 
 import pers.rush.model.*;
+import pers.rush.model.Font;
 import pers.rush.model.Rectangle;
 import pers.rush.model.Shape;
 import pers.rush.tool.Text;
@@ -25,8 +26,8 @@ public class DrawListener implements MouseListener, MouseMotionListener{
     public Color color; // 画笔颜色
     public Stroke s = new BasicStroke(1); // 画笔宽度
     public GraphFrame gf;
-    public ArrayList graphicsList;
-    public ArrayList textList;
+    public ArrayList<Shape> graphicsList;
+    public ArrayList<Text> textList;
     public boolean flag = true;
     public static final int eraserWidth = 5;
 
@@ -55,7 +56,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
 
     @Override
     public void mousePressed(MouseEvent e) {
-    	if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
+       if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
           ButtonModel bm = bg.getSelection();
           command = bm.getActionCommand();
           x1 = e.getX();
@@ -64,16 +65,14 @@ public class DrawListener implements MouseListener, MouseMotionListener{
           	  String str;
           	  str = JOptionPane.showInputDialog(gf, "请输入要插入的文本", "文本", 1);
           	  if(str != null){
-          		  Text t = new Text(str, x1, y1);
-            	  textList.add(t);
+                  Shape font = new Font(str, x1, y1, g.getColor(), s);
+                  font.draw(g);
+                  graphicsList.add(font);
           	  }
-          	  Cursor inputCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-        			new ImageIcon("resources//images//input.png").getImage(), new Point(10, 10), "eraser");
-        	  gf.setCursor(inputCursor);
           }
           else {
 //        	  for(int i = 0; i < graphicsList.size(); ++i){
-        		  System.out.println(x1 + "," + y1);
+        		  System.out.println("press: " + x1 + "," + y1);
 //        		  Shape s = (Shape)graphicsList.get(i);
 //        		  System.out.print(s + ": ");
 //        		  System.out.println(s.contains(x1, y1));
@@ -87,8 +86,8 @@ public class DrawListener implements MouseListener, MouseMotionListener{
     	if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
     		x2 = e.getX();
             y2 = e.getY();
-            System.out.println("command: " + command);
-            System.out.println(x2 + "," + y2);
+            System.out.println("released command: " + command);
+            System.out.println("release: " + x2 + "," + y2);
             if("cut".equals(command)){ }
             else if("copy".equals(command)){ }
             else if("paste".equals(command)){ }
@@ -132,7 +131,8 @@ public class DrawListener implements MouseListener, MouseMotionListener{
 
     @Override
     public void mouseDragged(MouseEvent e) {
-    	if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
+        // 鼠标左键 BUTTON1 mac可用 NOBUTTON windows可用
+        if(e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.NOBUTTON){
     		int x = e.getX();
             int y = e.getY();
             if("pencil".equals(command)){

@@ -2,6 +2,7 @@ package pers.rush.graph;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -70,9 +71,9 @@ public class GraphFrame extends JFrame implements ActionListener{
         pAbout.addActionListener(this);
 	}
 	// 放图形的容器
-    ArrayList graphicsList = new ArrayList();
+    ArrayList<Shape> graphicsList = new ArrayList<>();
     // 放文字的容器
-    ArrayList textList = new ArrayList();
+    ArrayList<Text> textList = new ArrayList();
     // 放恢复图形的容器
     Stack redoStack = new Stack();
     // 是否全选变量
@@ -86,10 +87,11 @@ public class GraphFrame extends JFrame implements ActionListener{
                 Shape shape = (Shape)graphicsList.get(i);
                 shape.draw(g2d);
             }
-            for(int i = 0; i < textList.size(); ++i){
-            	Text t = (Text)textList.get(i);
-            	g2d.drawString(t.getContent(), t.getX(), t.getY());
-            }
+//            for(int i = 0; i < textList.size(); ++i){
+//            	Text t = (Text)textList.get(i);
+//                Shape
+//            	g2d.drawString(t.getContent(), t.getX(), t.getY());
+//            }
             repaint();
         }
     };
@@ -430,6 +432,12 @@ public class GraphFrame extends JFrame implements ActionListener{
 		setSize(1100,600); // 设置窗口大小
         centerWindow(); // 窗口居中函数
 		initStyle(); // 初始化风格
+//        Toolkit toolkit = gf.getToolkit();
+//        Image image = toolkit.getImage("resources//images//icon.png");
+//        gf.setIconImage(image);
+//        gf.setVisible(true);
+        setIconImage(getToolkit().getImage("resources//images//icon.png"));
+        setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置点击X按钮关闭程序
     }
 	
@@ -554,13 +562,13 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     private void eraser() {
     	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-    			eraserIcon.getImage(), new Point(10, 10), "eraser");
+    			eraserIcon.getImage(), new Point(0, 0), "eraser");
     	setCursor(eraserCursor);
     }
 
     private void font() {
     	Cursor inputCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-    			new ImageIcon("resources//images//input.png").getImage(), new Point(10, 10), "eraser");
+    			new ImageIcon("resources//images//input.png").getImage(), new Point(0, 0), "eraser");
     	setCursor(inputCursor);
     }
 
