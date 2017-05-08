@@ -6,7 +6,9 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/3.
  */
 public class Rectangle extends Shape{
-    public Rectangle(){}
+    public Rectangle(){
+    	super();
+    }
 
     public Rectangle(int x1, int y1, int x2, int y2, Color color, Stroke stroke){
         this.x1 = x1;

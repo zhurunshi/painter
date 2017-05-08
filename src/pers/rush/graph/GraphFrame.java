@@ -2,7 +2,6 @@ package pers.rush.graph;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -10,6 +9,7 @@ import java.util.Stack;
 import javax.swing.*;
 
 import pers.rush.model.Shape;
+import pers.rush.tool.PainterRadioButton;
 import pers.rush.tool.PainterButton;
 import pers.rush.tool.PainterLabel;
 import pers.rush.tool.PainterMenu;
@@ -73,9 +73,9 @@ public class GraphFrame extends JFrame implements ActionListener{
 	// 放图形的容器
     ArrayList<Shape> graphicsList = new ArrayList<>();
     // 放文字的容器
-    ArrayList<Text> textList = new ArrayList();
+    ArrayList<Text> textList = new ArrayList<>();
     // 放恢复图形的容器
-    Stack redoStack = new Stack();
+    Stack<Shape> redoStack = new Stack<>();
     // 是否全选变量
     boolean selectAll = false;
     // 用JPanel作画布
@@ -172,41 +172,43 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pWidthBoard = new JPanel(new BorderLayout());
     JPanel pWidthButtons = new JPanel(new GridLayout(3, 1));
     JPanel pColorBoard = new JPanel(new BorderLayout());
+    JPanel pCurrentColor = new JPanel();
     JPanel pColorButtons = new JPanel(new GridLayout(2, 10, 3, 3));
 
     // 按钮组
     ButtonGroup bg = new ButtonGroup();
 
     // 工具栏
-    PainterButton cutButton = new PainterButton(
+    PainterRadioButton cutButton = new PainterRadioButton(
             new ImageIcon("resources//images//cut.png"), "剪切");
-    PainterButton copyButton = new PainterButton(
+    PainterRadioButton copyButton = new PainterRadioButton(
             new ImageIcon("resources//images//copy.png"), "复制");
-    PainterButton pasteButton = new PainterButton(
+    PainterRadioButton pasteButton = new PainterRadioButton(
             new ImageIcon("resources//images//paste.png"), "粘贴");
-    PainterButton lineButton = new PainterButton(
+    PainterRadioButton lineButton = new PainterRadioButton(
             new ImageIcon("resources//images//line.png"), "直线");
-    PainterButton rectangleButton = new PainterButton(
+    PainterRadioButton rectangleButton = new PainterRadioButton(
             new ImageIcon("resources//images//rectangle.png"), "矩形");
-    PainterButton ovalButton = new PainterButton(
+    PainterRadioButton ovalButton = new PainterRadioButton(
             new ImageIcon("resources//images//oval.png"), "椭圆形");
     ImageIcon pencilIcon = new ImageIcon("resources//images//pencil.png");
-    PainterButton pencilButton = new PainterButton(
+    PainterRadioButton pencilButton = new PainterRadioButton(
             pencilIcon, "铅笔");
     ImageIcon eraserIcon = new ImageIcon("resources//images//eraser.png");
-    PainterButton eraserButton = new PainterButton(
+    PainterRadioButton eraserButton = new PainterRadioButton(
             eraserIcon, "橡皮擦");
-    PainterButton fontButton = new PainterButton(
+    PainterRadioButton fontButton = new PainterRadioButton(
             new ImageIcon("resources//images//font.png"), "文本");
-    PainterButton smallWidthButton = new PainterButton(
+    PainterRadioButton smallWidthButton = new PainterRadioButton(
     		new ImageIcon("resources//images//small.png"), "小");
-    PainterButton medianWidthButton = new PainterButton(
+    PainterRadioButton medianWidthButton = new PainterRadioButton(
     		new ImageIcon("resources//images//median.png"), "中");
-    PainterButton largeWidthButton = new PainterButton(
+    PainterRadioButton largeWidthButton = new PainterRadioButton(
     		new ImageIcon("resources//images//large.png"), "大");
-//    PainterButton widthButton = new PainterButton(
+//    PainterRadioButton widthButton = new PainterRadioButton(
 //            new ImageIcon("resources//images//width.png"), "粗细");
-    PainterButton colorButton = new PainterButton(
+    PainterButton currentColorButton = new PainterButton("", Color.BLACK);
+    PainterRadioButton colorButton = new PainterRadioButton(
             new ImageIcon("resources//images//color_32px.png"), "更多颜色");
 
     private void initWidthMenu(){
@@ -312,7 +314,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pWidthBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pWidthBoard);
 
-        ButtonGroup cg = new ButtonGroup();
+//        ButtonGroup cg = new ButtonGroup();
         
         Color colors[] = new Color[]{
             new Color(0, 0, 0),
@@ -338,7 +340,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         };
 
         for(Color c : colors){
-            PainterButton colorButton = new PainterButton("", c);
+        	PainterButton colorButton = new PainterButton("", c);
             colorButton.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {}
@@ -351,9 +353,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         	    			s.color = c;
         	    		}
         			}
-                	else{
-                		currentColor = c;
-                	}
+                	currentColor = c;
+                	currentColorButton.setBackground(currentColor);
                 }
 
                 @Override
@@ -366,10 +367,13 @@ public class GraphFrame extends JFrame implements ActionListener{
                 public void mouseExited(MouseEvent e) {}
             });
             pColorButtons.add(colorButton);
-            cg.add(colorButton);
+//            cg.add(colorButton);
         }
         pColorButtons.setBackground(ToolPanelBgColor);
-        pColorBoard.add(pColorButtons, BorderLayout.WEST);
+        pCurrentColor.add(currentColorButton);
+        pCurrentColor.setBackground(ToolPanelBgColor);
+        pColorBoard.add(pCurrentColor, BorderLayout.WEST);
+        pColorBoard.add(pColorButtons, BorderLayout.CENTER);
         pColorBoard.add(colorButton, BorderLayout.EAST);
         pColorBoard.add(new PainterLabel("颜色", JLabel.CENTER), BorderLayout.SOUTH);
         pColorBoard.setBorder(BorderFactory.createEtchedBorder ());
@@ -384,9 +388,20 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 显示坐标栏
     JToolBar pToolBar = new JToolBar("坐标栏");
-    JLabel pPosition = new JLabel("");
+    JLabel pPosition = new JLabel();
     JLabel pDimension = new JLabel("像素");
     private void initToolBar(){
+    	pPanel.addMouseMotionListener(new MouseMotionListener(){
+
+			@Override
+			public void mouseDragged(MouseEvent e) {}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				// TODO Auto-generated method stub
+				pPosition.setText("(" + e.getX() + "," + e.getY() + ")");
+			}
+    	});
         Container c = getContentPane();
         c.add(BorderLayout.SOUTH, pToolBar);
         pToolBar.add(pPosition);
@@ -554,9 +569,8 @@ public class GraphFrame extends JFrame implements ActionListener{
 	    			s.color = tmpColor;
 	    		}
 			}
-			else{
-				currentColor = tmpColor;
-			}
+			currentColor = tmpColor;
+			currentColorButton.setBackground(currentColor);
         }
     }
 

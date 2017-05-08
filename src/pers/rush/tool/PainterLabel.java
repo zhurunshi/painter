@@ -11,4 +11,5 @@ public class PainterLabel extends JLabel {
         super(text, horizontalAlignment);
         setForeground(Color.GRAY);
     }
+    public PainterLabel(String text, Icon)
 }
