@@ -104,7 +104,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         this.setVisible(true);
         pPanel.setBackground(Color.WHITE);
         Graphics g = pPanel.getGraphics();
-        DrawListener dl = new DrawListener(g, bg, this, graphicsList, textList);
+        DrawListener dl = new DrawListener(g, bg, this, graphicsList);
         pencilButton.setSelected(true);
         pPanel.addMouseListener(dl);
         pPanel.addMouseMotionListener(dl);
@@ -390,7 +390,8 @@ public class GraphFrame extends JFrame implements ActionListener{
     // 显示坐标栏
     JToolBar pToolBar = new JToolBar("坐标栏");
     JLabel pPositionIcon = new JLabel(new ImageIcon("resources//images//coord.png"));
-    JLabel pPosition = new JLabel("                    ");
+    JLabel pPosition = new JLabel("                      ");
+    JLabel pDimensionIcon = new JLabel(new ImageIcon("resources//images//size.png"));
     JLabel pDimension = new JLabel();
     private void initToolBar(){
         pPosition.setPreferredSize(new Dimension(200, 16));
@@ -398,19 +399,19 @@ public class GraphFrame extends JFrame implements ActionListener{
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-                pPosition.setText(" " + e.getX() + ", " + e.getY() + "像素        ");
+                pPosition.setText("  " + e.getX() + ", " + e.getY() + "像素        ");
             }
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				// TODO Auto-generated method stub
-				pPosition.setText(" " + e.getX() + ", " + e.getY() + "像素        ");
+				pPosition.setText("  " + e.getX() + ", " + e.getY() + "像素        ");
 			}
     	});
         pPanel.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                pDimension.setText(pPanel.getWidth() + " × " + pPanel.getHeight() + "像素");
+                pDimension.setText("  " + pPanel.getWidth() + " × " + pPanel.getHeight() + "像素");
             }
 
             @Override
@@ -432,10 +433,11 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolBar.add(pPositionIcon);
         pToolBar.add(pPosition);
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-        sep.setPreferredSize(new Dimension(20, 20));
-        sep.setMaximumSize(new Dimension(20, 20));
-        sep.setMinimumSize(new Dimension(20, 20));
+        sep.setPreferredSize(new Dimension(5, 20));
+        sep.setMaximumSize(new Dimension(5, 20));
+        sep.setMinimumSize(new Dimension(5, 20));
         pToolBar.add(sep);
+        pToolBar.add(pDimensionIcon);
         pToolBar.add(pDimension);
         pToolBar.setFloatable(false);
     }

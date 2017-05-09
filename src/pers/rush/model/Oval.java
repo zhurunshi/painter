@@ -10,34 +10,28 @@ public class Oval extends Shape{
         super();
     }
 
-    public Oval(int x1, int y1, int x2, int y2, Color color, Stroke stroke){
-        super(x1, y1, x2, y2, color, stroke);
+    public Oval(int x1, int y1, int width, int height, Color color, Stroke stroke){
+        super(x1, y1, color, stroke);
+        this.width = width;
+        this.height = height;
     }
 
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
         g.setStroke(stroke);
-        g.drawOval(x1, y1, x2, y2);
-    }
-
-    private int getWidth(){
-    	return Math.abs(x2 - x1) + 1;
-    }
-    
-    private int getHeight(){
-    	return Math.abs(y2 - y1) + 1;
+        g.drawOval(x1, y1, width, height);
     }
     
 	@Override
 	public boolean contains(int x, int y) {
 		// TODO Auto-generated method stub
-		double ellw = getWidth();
+		double ellw = width;
         if (ellw <= 0.0) {
             return false;
         }
         double normx = (x - x1) / ellw - 0.5;
-        double ellh = getHeight();
+        double ellh = height;
         if (ellh <= 0.0) {
             return false;
         }

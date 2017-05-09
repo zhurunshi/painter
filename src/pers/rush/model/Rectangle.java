@@ -10,36 +10,28 @@ public class Rectangle extends Shape{
     	super();
     }
 
-    public Rectangle(int x1, int y1, int x2, int y2, Color color, Stroke stroke){
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
-        this.color = color;
-        this.stroke = stroke;
+    public Rectangle(int x1, int y1, int width, int height, Color color, Stroke stroke){
+        super(x1, y1, color, stroke);
+        this.width = width;
+        this.height = height;
     }
 
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
         g.setStroke(stroke);
-        g.drawRect(x1, y1, x2, y2);
-    }
-
-    private int getWidth(){
-    	return Math.abs(x2 - x1) + 1;
-    }
-    
-    private int getHeight(){
-    	return Math.abs(y2 - y1) + 1;
+        g.drawRect(x1, y1, width, height);
     }
     
 	@Override
 	public boolean contains(int x, int y) {
 		// TODO Auto-generated method stub
-        return (x >= x1 &&
-                y >= y1 &&
-                x < x1 + getWidth() &&
-                y < y1 + getHeight());
+        if(x >= x1 && x <= (x1 + height) && y >= y1 && y <= (y1 + height)){
+            return true;
+        }
+        if(x >= (x1 - height) && x <= x1 && y >= (y1 - height) && y <= y1){
+            return true;
+        }
+        return false;
 	}
 }
