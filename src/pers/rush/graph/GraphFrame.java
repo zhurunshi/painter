@@ -83,9 +83,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         public void paint(Graphics g){
             Graphics2D g2d = (Graphics2D)g;
             super.paint(g);
-            for(int i = 0; i < graphicsList.size(); ++i){
-                Shape shape = (Shape)graphicsList.get(i);
-                shape.draw(g2d);
+            for(Shape s : graphicsList){
+                s.draw(g2d);
             }
 //            for(int i = 0; i < textList.size(); ++i){
 //            	Text t = (Text)textList.get(i);
@@ -96,8 +95,12 @@ public class GraphFrame extends JFrame implements ActionListener{
         }
     };
 
+    private void initFrame(){
+        setLayout(new BorderLayout());
+    }
+
     private void initpPanel(){
-        add(pPanel); // 将画布添加到JFrame
+        add(pPanel, BorderLayout.CENTER); // 将画布添加到JFrame
         this.setVisible(true);
         pPanel.setBackground(Color.WHITE);
         Graphics g = pPanel.getGraphics();
@@ -268,8 +271,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         fontButton.setActionCommand("font");
         colorButton.setActionCommand("color");
 
-        Container container = getContentPane();
-        container.add(BorderLayout.NORTH, pToolPanel);
+        add(pToolPanel, BorderLayout.NORTH);
         pToolPanel.setBackground(ToolPanelBgColor);
         pClipButtons.add(cutButton);
         pClipButtons.add(copyButton);
@@ -348,8 +350,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                 @Override
                 public void mousePressed(MouseEvent e) {
                 	if(selectAll){
-        				for(int i = 0; i < graphicsList.size(); ++i){
-        	    			Shape s = (Shape)graphicsList.get(i);
+                        for(Shape s : graphicsList){
         	    			s.color = c;
         	    		}
         			}
@@ -388,24 +389,53 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 显示坐标栏
     JToolBar pToolBar = new JToolBar("坐标栏");
-    JLabel pPosition = new JLabel();
-    JLabel pDimension = new JLabel("像素");
+    JLabel pPositionIcon = new JLabel(new ImageIcon("resources//images//coord.png"));
+    JLabel pPosition = new JLabel("                    ");
+    JLabel pDimension = new JLabel();
     private void initToolBar(){
-    	pPanel.addMouseMotionListener(new MouseMotionListener(){
+        pPosition.setPreferredSize(new Dimension(200, 16));
+        pPanel.addMouseMotionListener(new MouseMotionListener(){
 
 			@Override
-			public void mouseDragged(MouseEvent e) {}
+			public void mouseDragged(MouseEvent e) {
+                pPosition.setText(" " + e.getX() + ", " + e.getY() + "像素        ");
+            }
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				// TODO Auto-generated method stub
-				pPosition.setText("(" + e.getX() + "," + e.getY() + ")");
+				pPosition.setText(" " + e.getX() + ", " + e.getY() + "像素        ");
 			}
     	});
-        Container c = getContentPane();
-        c.add(BorderLayout.SOUTH, pToolBar);
+        pPanel.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                pDimension.setText(pPanel.getWidth() + " × " + pPanel.getHeight() + "像素");
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+
+            }
+        });
+        add(pToolBar, BorderLayout.SOUTH);
+        pToolBar.add(pPositionIcon);
         pToolBar.add(pPosition);
-        pToolBar.addSeparator();
+        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+        sep.setPreferredSize(new Dimension(20, 20));
+        sep.setMaximumSize(new Dimension(20, 20));
+        sep.setMinimumSize(new Dimension(20, 20));
+        pToolBar.add(sep);
         pToolBar.add(pDimension);
         pToolBar.setFloatable(false);
     }
@@ -438,6 +468,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 	
 	// 程序初始化
 	private void initProcedure(){
+        initFrame(); // 初始化布局
 		initMenus(); // 初始化菜单栏
         initpPanel(); // 初始化画布
 		initRightClickMenu(); // 右键弹出菜单
@@ -522,8 +553,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         else if(e.getSource() == largeWidthButton){
         	Stroke selectedStroke = new BasicStroke(10);
         	if(selectAll){
-				for(int i = 0; i < graphicsList.size(); ++i){
-	    			Shape s = (Shape)graphicsList.get(i);
+                for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
@@ -534,8 +564,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         else if(e.getSource() == medianWidthButton){
         	Stroke selectedStroke = new BasicStroke(5);
         	if(selectAll){
-				for(int i = 0; i < graphicsList.size(); ++i){
-	    			Shape s = (Shape)graphicsList.get(i);
+                for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
@@ -546,8 +575,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         else if(e.getSource() == smallWidthButton){
         	Stroke selectedStroke = new BasicStroke(1);
         	if(selectAll){
-				for(int i = 0; i < graphicsList.size(); ++i){
-	    			Shape s = (Shape)graphicsList.get(i);
+                for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
@@ -564,8 +592,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 		Color tmpColor = JColorChooser.showDialog(this, "编辑颜色", pPanel.getBackground());
 		if(tmpColor != null){
 			if(selectAll){
-				for(int i = 0; i < graphicsList.size(); ++i){
-	    			Shape s = (Shape)graphicsList.get(i);
+                for(Shape s : graphicsList){
 	    			s.color = tmpColor;
 	    		}
 			}
@@ -575,21 +602,21 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void eraser() {
-    	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-    			eraserIcon.getImage(), new Point(0, 0), "eraser");
-    	setCursor(eraserCursor);
+//    	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+//    			eraserIcon.getImage(), new Point(0, 0), "eraser");
+//    	setCursor(eraserCursor);
     }
 
     private void font() {
-    	Cursor inputCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-    			new ImageIcon("resources//images//input.png").getImage(), new Point(0, 0), "eraser");
-    	setCursor(inputCursor);
+//    	Cursor inputCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+//    			new ImageIcon("resources//images//input.png").getImage(), new Point(0, 0), "eraser");
+//    	setCursor(inputCursor);
     }
 
     private void pencil() {
-    	Cursor pencilCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-    			pencilIcon.getImage(), new Point(10, 10), "pencil");
-    	setCursor(pencilCursor);
+//    	Cursor pencilCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+//    			pencilIcon.getImage(), new Point(10, 10), "pencil");
+//    	setCursor(pencilCursor);
     }
 
     private void oval() {
@@ -622,7 +649,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     private void redo() {
     	if(!redoStack.empty()){
-    		Shape s = (Shape)redoStack.pop(); // 删除栈顶元素并返回栈顶元素
+    		Shape s = redoStack.pop(); // 删除栈顶元素并返回栈顶元素
         	if(s != null){
         		graphicsList.add(s);
         	}
@@ -632,7 +659,7 @@ public class GraphFrame extends JFrame implements ActionListener{
     private void undo() {
     	int index = graphicsList.size() - 1;
     	if(index >= 0){
-    		Shape s = (Shape)graphicsList.get(index);
+    		Shape s = graphicsList.get(index);
     		graphicsList.remove(index); 
     		redoStack.push(s);
     	}

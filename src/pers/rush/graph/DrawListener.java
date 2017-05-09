@@ -145,7 +145,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
             else if("eraser".equals(command)){
                 g.setColor(Color.WHITE);
                 g.setStroke(new BasicStroke(eraserWidth));
-                Shape line = new Line(x1, y1, x, y, g.getColor(), s);
+                Shape line = new Line(x1, y1, x, y, g.getColor(), new BasicStroke(eraserWidth));
                 line.draw(g);
                 graphicsList.add(line);
 
