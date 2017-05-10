@@ -108,6 +108,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pencilButton.setSelected(true);
         pPanel.addMouseListener(dl);
         pPanel.addMouseMotionListener(dl);
+        addKeyListener(dl);
     }
 
 	// 右键菜单
@@ -228,6 +229,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         wg.add(smallWidthButton);
         wg.add(medianWidthButton);
         wg.add(largeWidthButton);
+        smallWidthButton.setSelected(true);
 
         smallWidthButton.setActionCommand("small");
         medianWidthButton.setActionCommand("median");
@@ -357,8 +359,10 @@ public class GraphFrame extends JFrame implements ActionListener{
             new Color(200, 191, 231),
         };
 
-        for(Color c : colors){
+        for(int i = 0; i < colors.length; ++i){
+        	Color c = colors[i];
         	PainterButton colorButton = new PainterButton("", c);
+        	colorButton.setActionCommand(String.valueOf(i));
             colorButton.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {}
@@ -372,6 +376,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         			}
                 	currentColor = c;
                 	currentColorButton.setBackground(currentColor);
+                	colorButton.setSelected(true);
                 }
 
                 @Override
@@ -411,7 +416,8 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     JLabel pDimensionIcon = new JLabel(new ImageIcon("resources//images//size.png"));
     JLabel pDimension = new JLabel();
-    JLabel pAction = new JLabel("当前动作：铅笔");
+    JLabel pAction = new JLabel("动作：铅笔         ");
+    JLabel pWidth = new JLabel("画笔宽度：1px");
     private void initToolBar(){
         pPanel.addMouseMotionListener(new MouseMotionListener(){
 
@@ -455,6 +461,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolBar.add(pDimension);
         pToolBar.addSeparator(new Dimension(16, 16));
         pToolBar.add(pAction);
+        pToolBar.addSeparator(new Dimension(16, 16));
+        pToolBar.add(pWidth);
         pToolBar.setFloatable(false);
     }
 	
@@ -549,35 +557,35 @@ public class GraphFrame extends JFrame implements ActionListener{
         }
         else if(e.getSource() == pSelectAll){
             selectAll();
-            pAction.setText("当前动作：全选");
+            pAction.setText("动作：全选         ");
         }
         else if(e.getSource() == lineButton){
             line();
-            pAction.setText("当前动作：直线");
+            pAction.setText("动作：直线         ");
         }
         else if(e.getSource() == rectangleButton){
             rectangle();
-            pAction.setText("当前动作：矩形");
+            pAction.setText("动作：矩形         ");
         }
         else if(e.getSource() == ovalButton){
             oval();
-            pAction.setText("当前动作：椭圆形");
+            pAction.setText("动作：椭圆形         ");
         }
         else if(e.getSource() == pencilButton){
             pencil();
-            pAction.setText("当前动作：铅笔");
+            pAction.setText("动作：铅笔         ");
         }
         else if(e.getSource() == fontButton){
             font();
-            pAction.setText("当前动作：添加文本");
+            pAction.setText("动作：添加文本         ");
         }
         else if(e.getSource() == pointerButton){
             pointer();
-            pAction.setText("当前动作：选取");
+            pAction.setText("动作：选取         ");
         }
         else if(e.getSource() == eraserButton){
             eraser();
-            pAction.setText("当前动作：橡皮");
+            pAction.setText("动作：橡皮擦         ");
         }
         else if(e.getSource() == largeWidthButton){
         	Stroke selectedStroke = new BasicStroke(10);
@@ -589,6 +597,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         	else{
         		s = selectedStroke;
         	}
+        	pWidth.setText("画笔宽度：10px");
         }
         else if(e.getSource() == medianWidthButton){
         	Stroke selectedStroke = new BasicStroke(5);
@@ -600,6 +609,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         	else{
         		s = selectedStroke;
         	}
+        	pWidth.setText("画笔宽度：5px");
         }
         else if(e.getSource() == smallWidthButton){
         	Stroke selectedStroke = new BasicStroke(1);
@@ -611,6 +621,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         	else{
         		s = selectedStroke;
         	}
+        	pWidth.setText("画笔宽度：1px");
         }
         else if(e.getSource() == colorButton){
             setColor();
@@ -630,7 +641,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         }
     }
 
-    private void pointer(){}
+    private void pointer(){
+    }
 
     private void eraser() {
 //    	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(

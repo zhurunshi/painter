@@ -56,6 +56,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
 
     @Override
     public void mousePressed(MouseEvent e) {
+    	gf.requestFocus();
        if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
            ButtonModel bm = bg.getSelection();
            command = bm.getActionCommand();
@@ -71,25 +72,28 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                }
            }
            else if ("pointer".equals(command)){
-               for (Shape s : graphicsList) {
-                   if(s.contains(x1, y1)){ // 鼠标点击的坐标在图形内
-                       System.out.print(s + ": ");
-                       System.out.println(s.contains(x1, y1));
-                       ButtonModel bmStroke = wg.getSelection();
-                       String commandStroke = bmStroke.getActionCommand();
-                       if("small".equals(commandStroke)){
-                           s.stroke = new BasicStroke(1);
-                       }
-                       else if("median".equals(commandStroke)){
-                           s.stroke = new BasicStroke(5);
-                       }
-                       else if("large".equals(commandStroke)){
-                           s.stroke = new BasicStroke(10);
-                       }
-                       ButtonModel bmColor = cg.getSelection();
-                       String commandColor = bmColor.getActionCommand();
-                   }
+        	   for (Shape s : graphicsList) {
+        		   if(s.contains(x1, y1)){ // 鼠标点击的坐标在图形内
+        			   currentShape = s;
+        		   }
+        	   }
+        	   if(currentShape != null){
+        		   System.out.print(currentShape + ": ");
+                   System.out.println(currentShape.contains(x1, y1));
+        	   }
+               ButtonModel bmStroke = wg.getSelection();
+               String commandStroke = bmStroke.getActionCommand();
+               if("small".equals(commandStroke)){
+            	   currentShape.stroke = new BasicStroke(1);
                }
+               else if("median".equals(commandStroke)){
+            	   currentShape.stroke = new BasicStroke(5);
+               }
+               else if("large".equals(commandStroke)){
+            	   currentShape.stroke = new BasicStroke(10);
+               }
+//               ButtonModel bmColor = cg.getSelection();
+//               String commandColor = bmColor.getActionCommand();
            }
            else {
                System.out.println("================================");
@@ -217,6 +221,24 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                     currentShape.height = y - y1;
                 }
             }
+            else if("pointer".equals(command)){
+            	int deltaX = x - x1;
+            	int deltaY = y - y1;
+            	for(Shape s : graphicsList){
+            		if(s.contains(x, y)){
+            			s.x1 += deltaX;
+            			s.y1 += deltaY;
+            			x1 = x;
+                		y1 = y;
+                		if(s.getClass().equals(Line.class)){
+                			s.x2 += deltaX;
+                			s.y2 += deltaY;
+                    		x2 = x;
+                    		y2 = y;
+            			}
+            		}
+            	}
+            }
     	}
     }
 
@@ -232,7 +254,16 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+    	if(currentShape != null && currentShape.contains(x1, y1)){
+			if(e.getKeyChar() == '+'){
+				currentShape.height *= 1.2;
+				currentShape.width *= 1.2;
+	    	}
+	    	else if(e.getKeyChar() == '-'){
+	    		currentShape.height /= 1.2;
+	    		currentShape.width /= 1.2;
+	    	}
+		}
     }
 
     @Override
