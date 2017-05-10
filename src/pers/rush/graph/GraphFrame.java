@@ -104,7 +104,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         this.setVisible(true);
         pPanel.setBackground(Color.WHITE);
         Graphics g = pPanel.getGraphics();
-        DrawListener dl = new DrawListener(g, bg, this, graphicsList);
+        DrawListener dl = new DrawListener(g, bg, wg, cg, this, graphicsList);
         pencilButton.setSelected(true);
         pPanel.addMouseListener(dl);
         pPanel.addMouseMotionListener(dl);
@@ -171,7 +171,7 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pShapeBoard = new JPanel(new BorderLayout());
     JPanel pShapeButtons = new JPanel(new GridLayout(1, 3));
     JPanel pToolBoard = new JPanel(new BorderLayout());
-    JPanel pToolButtons = new JPanel(new GridLayout(1, 3));
+    JPanel pToolButtons = new JPanel(new GridLayout(1, 4));
     JPanel pWidthBoard = new JPanel(new BorderLayout());
     JPanel pWidthButtons = new JPanel(new GridLayout(3, 1));
     JPanel pColorBoard = new JPanel(new BorderLayout());
@@ -180,6 +180,10 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 按钮组
     ButtonGroup bg = new ButtonGroup();
+    // 画笔粗细组
+    ButtonGroup wg = new ButtonGroup();
+    // 颜色组
+    ButtonGroup cg = new ButtonGroup();
 
     // 工具栏
     PainterRadioButton cutButton = new PainterRadioButton(
@@ -202,6 +206,8 @@ public class GraphFrame extends JFrame implements ActionListener{
             eraserIcon, "橡皮擦");
     PainterRadioButton fontButton = new PainterRadioButton(
             new ImageIcon("resources//images//font.png"), "文本");
+    PainterRadioButton pointerButton = new PainterRadioButton(
+            new ImageIcon("resources//images//pointer.png"), "选取");
     PainterRadioButton smallWidthButton = new PainterRadioButton(
     		new ImageIcon("resources//images//small.png"), "小");
     PainterRadioButton medianWidthButton = new PainterRadioButton(
@@ -218,6 +224,14 @@ public class GraphFrame extends JFrame implements ActionListener{
         pWidthButtons.add(smallWidthButton);
         pWidthButtons.add(medianWidthButton);
         pWidthButtons.add(largeWidthButton);
+
+        wg.add(smallWidthButton);
+        wg.add(medianWidthButton);
+        wg.add(largeWidthButton);
+
+        smallWidthButton.setActionCommand("small");
+        medianWidthButton.setActionCommand("median");
+        largeWidthButton.setActionCommand("large");
 
         // 快捷键
 //        pSmall.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
@@ -245,6 +259,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pencilButton.addActionListener(this);
         eraserButton.addActionListener(this);
         fontButton.addActionListener(this);
+        pointerButton.addActionListener(this);
         smallWidthButton.addActionListener(this);
         medianWidthButton.addActionListener(this);
         largeWidthButton.addActionListener(this);
@@ -259,6 +274,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         bg.add(pencilButton);
         bg.add(eraserButton);
         bg.add(fontButton);
+        bg.add(pointerButton);
 
         cutButton.setActionCommand("cut");
         copyButton.setActionCommand("copy");
@@ -269,6 +285,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pencilButton.setActionCommand("pencil");
         eraserButton.setActionCommand("eraser");
         fontButton.setActionCommand("font");
+        pointerButton.setActionCommand("pointer");
         colorButton.setActionCommand("color");
 
         add(pToolPanel, BorderLayout.NORTH);
@@ -298,6 +315,7 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolButtons.add(pencilButton);
         pToolButtons.add(fontButton);
         pToolButtons.add(eraserButton);
+        pToolButtons.add(pointerButton);
         pToolButtons.setBackground(ToolPanelBgColor);
         pToolBoard.add(pToolButtons, BorderLayout.NORTH);
         pToolBoard.add(new PainterLabel("　", JLabel.CENTER), BorderLayout.CENTER);
@@ -315,8 +333,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         pWidthBoard.setBorder(BorderFactory.createEtchedBorder ());
         pWidthBoard.setBackground(ToolPanelBgColor);
         pToolPanel.add(pWidthBoard);
-
-//        ButtonGroup cg = new ButtonGroup();
         
         Color colors[] = new Color[]{
             new Color(0, 0, 0),
@@ -368,7 +384,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                 public void mouseExited(MouseEvent e) {}
             });
             pColorButtons.add(colorButton);
-//            cg.add(colorButton);
+            cg.add(colorButton);
         }
         pColorButtons.setBackground(ToolPanelBgColor);
         pCurrentColor.add(currentColorButton);
@@ -385,16 +401,18 @@ public class GraphFrame extends JFrame implements ActionListener{
         copyButton.addActionListener(this);
         pasteButton.addActionListener(this);
         fontButton.addActionListener(this);
+        pointerButton.addActionListener(this);
     }
 
     // 显示坐标栏
     JToolBar pToolBar = new JToolBar("坐标栏");
     JLabel pPositionIcon = new JLabel(new ImageIcon("resources//images//coord.png"));
     JLabel pPosition = new JLabel("                      ");
+
     JLabel pDimensionIcon = new JLabel(new ImageIcon("resources//images//size.png"));
     JLabel pDimension = new JLabel();
+    JLabel pAction = new JLabel("当前动作：铅笔");
     private void initToolBar(){
-        pPosition.setPreferredSize(new Dimension(200, 16));
         pPanel.addMouseMotionListener(new MouseMotionListener(){
 
 			@Override
@@ -405,13 +423,13 @@ public class GraphFrame extends JFrame implements ActionListener{
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				// TODO Auto-generated method stub
-				pPosition.setText("  " + e.getX() + ", " + e.getY() + "像素        ");
+				pPosition.setText("  " + e.getX() + ", " + e.getY() + "像素         ");
 			}
     	});
         pPanel.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                pDimension.setText("  " + pPanel.getWidth() + " × " + pPanel.getHeight() + "像素");
+                pDimension.setText("  " + pPanel.getWidth() + " × " + pPanel.getHeight() + "像素         ");
             }
 
             @Override
@@ -432,13 +450,11 @@ public class GraphFrame extends JFrame implements ActionListener{
         add(pToolBar, BorderLayout.SOUTH);
         pToolBar.add(pPositionIcon);
         pToolBar.add(pPosition);
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-        sep.setPreferredSize(new Dimension(5, 20));
-        sep.setMaximumSize(new Dimension(5, 20));
-        sep.setMinimumSize(new Dimension(5, 20));
-        pToolBar.add(sep);
+        pToolBar.addSeparator(new Dimension(16, 16));
         pToolBar.add(pDimensionIcon);
         pToolBar.add(pDimension);
+        pToolBar.addSeparator(new Dimension(16, 16));
+        pToolBar.add(pAction);
         pToolBar.setFloatable(false);
     }
 	
@@ -533,24 +549,35 @@ public class GraphFrame extends JFrame implements ActionListener{
         }
         else if(e.getSource() == pSelectAll){
             selectAll();
+            pAction.setText("当前动作：全选");
         }
         else if(e.getSource() == lineButton){
             line();
+            pAction.setText("当前动作：直线");
         }
         else if(e.getSource() == rectangleButton){
             rectangle();
+            pAction.setText("当前动作：矩形");
         }
         else if(e.getSource() == ovalButton){
             oval();
+            pAction.setText("当前动作：椭圆形");
         }
         else if(e.getSource() == pencilButton){
             pencil();
+            pAction.setText("当前动作：铅笔");
         }
         else if(e.getSource() == fontButton){
             font();
+            pAction.setText("当前动作：添加文本");
+        }
+        else if(e.getSource() == pointerButton){
+            pointer();
+            pAction.setText("当前动作：选取");
         }
         else if(e.getSource() == eraserButton){
             eraser();
+            pAction.setText("当前动作：橡皮");
         }
         else if(e.getSource() == largeWidthButton){
         	Stroke selectedStroke = new BasicStroke(10);
@@ -602,6 +629,8 @@ public class GraphFrame extends JFrame implements ActionListener{
 			currentColorButton.setBackground(currentColor);
         }
     }
+
+    private void pointer(){}
 
     private void eraser() {
 //    	Cursor eraserCursor = Toolkit.getDefaultToolkit().createCustomCursor(

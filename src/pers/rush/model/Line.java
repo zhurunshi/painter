@@ -26,6 +26,6 @@ public class Line extends Shape {
 	@Override
 	public boolean contains(int x, int y) {
 		// TODO Auto-generated method stub
-		return false;
+		return Math.abs( (y - y1) * (x2 - x) - (x - x1) * (y2 - y) ) <= 1500;
 	}
 }

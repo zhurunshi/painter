@@ -8,20 +8,20 @@ import pers.rush.tool.Text;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 /**
  * Created by ZhuRunShi on 2017/5/4.
  */
-public class DrawListener implements MouseListener, MouseMotionListener{
+public class DrawListener implements MouseListener, MouseMotionListener, KeyListener{
 
     public Graphics2D g;
     public int x1, y1, x2, y2, ox, oy, x3, y3;
-    public ButtonGroup bg;
+    public ButtonGroup bg; // 按钮组
+    public ButtonGroup wg; // 画笔粗细组
+    public ButtonGroup cg; // 颜色组
     public String command;
     public Color color; // 画笔颜色
     public Stroke s = new BasicStroke(1); // 画笔宽度
@@ -29,7 +29,7 @@ public class DrawListener implements MouseListener, MouseMotionListener{
     public ArrayList<Shape> graphicsList;
     public ArrayList<Text> textList;
     public boolean first = true;
-    public static final int eraserWidth = 5;
+    public static final int eraserWidth = 10;
     public Shape currentShape;
 
     public DrawListener(Graphics g){
@@ -41,9 +41,11 @@ public class DrawListener implements MouseListener, MouseMotionListener{
         this.bg = bg;
     }
 
-    public DrawListener(Graphics g, ButtonGroup bg, GraphFrame gf, ArrayList<Shape> graphicsList){
+    public DrawListener(Graphics g, ButtonGroup bg, ButtonGroup wg, ButtonGroup cg, GraphFrame gf, ArrayList<Shape> graphicsList){
         this.g = (Graphics2D)g;
         this.bg = bg;
+        this.wg = wg;
+        this.cg = cg;
         this.gf = gf;
         this.graphicsList = graphicsList;
     }
@@ -66,6 +68,27 @@ public class DrawListener implements MouseListener, MouseMotionListener{
                    Shape font = new Font(str, x1, y1, g.getColor(), s);
                    font.draw(g);
                    graphicsList.add(font);
+               }
+           }
+           else if ("pointer".equals(command)){
+               for (Shape s : graphicsList) {
+                   if(s.contains(x1, y1)){ // 鼠标点击的坐标在图形内
+                       System.out.print(s + ": ");
+                       System.out.println(s.contains(x1, y1));
+                       ButtonModel bmStroke = wg.getSelection();
+                       String commandStroke = bmStroke.getActionCommand();
+                       if("small".equals(commandStroke)){
+                           s.stroke = new BasicStroke(1);
+                       }
+                       else if("median".equals(commandStroke)){
+                           s.stroke = new BasicStroke(5);
+                       }
+                       else if("large".equals(commandStroke)){
+                           s.stroke = new BasicStroke(10);
+                       }
+                       ButtonModel bmColor = cg.getSelection();
+                       String commandColor = bmColor.getActionCommand();
+                   }
                }
            }
            else {
@@ -199,6 +222,21 @@ public class DrawListener implements MouseListener, MouseMotionListener{
 
     @Override
     public void mouseMoved(MouseEvent e) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
 
     }
 }
