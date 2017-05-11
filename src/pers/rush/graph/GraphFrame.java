@@ -797,9 +797,12 @@ public class GraphFrame extends JFrame implements ActionListener{
 	}
 
 	private void open() {
-    	if( !graphicsList.isEmpty() ){
-    		
+		if( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ){
+			// 直接打开
     	}
+		else{
+			
+		}
     }
 
     private void newFile() {
