@@ -2,6 +2,7 @@ package pers.rush.graph;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -97,18 +98,26 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     private void initFrame(){
         setLayout(new BorderLayout());
+        setVisible(true);
     }
+    // 按钮组
+    ButtonGroup bg = new ButtonGroup();
+    // 画笔粗细组
+    ButtonGroup wg = new ButtonGroup();
+    // 颜色组
+    ButtonGroup cg = new ButtonGroup();
+    // 声明监听器
+    DrawListener dl;
 
     private void initpPanel(){
         add(pPanel, BorderLayout.CENTER); // 将画布添加到JFrame
-        this.setVisible(true);
         pPanel.setBackground(Color.WHITE);
         Graphics g = pPanel.getGraphics();
-        DrawListener dl = new DrawListener(g, bg, wg, cg, this, graphicsList);
+        dl = new DrawListener(g, bg, wg, cg, this, graphicsList);
         pencilButton.setSelected(true);
         pPanel.addMouseListener(dl);
         pPanel.addMouseMotionListener(dl);
-        addKeyListener(dl);
+        EventQueue.invokeLater( () -> addKeyListener(dl) );
     }
 
 	// 右键菜单
@@ -179,13 +188,6 @@ public class GraphFrame extends JFrame implements ActionListener{
     JPanel pCurrentColor = new JPanel();
     JPanel pColorButtons = new JPanel(new GridLayout(2, 10, 3, 3));
 
-    // 按钮组
-    ButtonGroup bg = new ButtonGroup();
-    // 画笔粗细组
-    ButtonGroup wg = new ButtonGroup();
-    // 颜色组
-    ButtonGroup cg = new ButtonGroup();
-
     // 工具栏
     PainterRadioButton cutButton = new PainterRadioButton(
             new ImageIcon("resources//images//cut.png"), "剪切");
@@ -246,7 +248,8 @@ public class GraphFrame extends JFrame implements ActionListener{
     // 当前画笔颜色
     Color currentColor = Color.BLACK;
     // 当前画笔粗细
-    Stroke s = new BasicStroke(1);
+    int currentStrokeSize = 1;
+    Stroke currentStroke = new BasicStroke(currentStrokeSize);
     // 背景颜色
     Color bgColor;
 
@@ -377,6 +380,9 @@ public class GraphFrame extends JFrame implements ActionListener{
                 	currentColor = c;
                 	currentColorButton.setBackground(currentColor);
                 	colorButton.setSelected(true);
+                    if(dl.currentShape != null){
+                        dl.currentShape.color = colorButton.getBackground();
+                    }
                 }
 
                 @Override
@@ -509,7 +515,6 @@ public class GraphFrame extends JFrame implements ActionListener{
 //        gf.setIconImage(image);
 //        gf.setVisible(true);
         setIconImage(getToolkit().getImage("resources//images//icon.png"));
-        setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置点击X按钮关闭程序
     }
 	
@@ -588,40 +593,52 @@ public class GraphFrame extends JFrame implements ActionListener{
             pAction.setText("动作：橡皮擦         ");
         }
         else if(e.getSource() == largeWidthButton){
-        	Stroke selectedStroke = new BasicStroke(10);
+            currentStrokeSize = 10;
+        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
         	if(selectAll){
                 for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
         	else{
-        		s = selectedStroke;
+                currentStroke = selectedStroke;
+                if(dl.currentShape != null){
+                    dl.currentShape.stroke = selectedStroke;
+                }
         	}
-        	pWidth.setText("画笔宽度：10px");
+        	pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
         }
         else if(e.getSource() == medianWidthButton){
-        	Stroke selectedStroke = new BasicStroke(5);
+            currentStrokeSize = 5;
+        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
         	if(selectAll){
                 for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
         	else{
-        		s = selectedStroke;
+                currentStroke = selectedStroke;
+                if(dl.currentShape != null){
+                    dl.currentShape.stroke = selectedStroke;
+                }
         	}
-        	pWidth.setText("画笔宽度：5px");
+            pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
         }
         else if(e.getSource() == smallWidthButton){
-        	Stroke selectedStroke = new BasicStroke(1);
+            currentStrokeSize = 1;
+        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
         	if(selectAll){
                 for(Shape s : graphicsList){
 	    			s.stroke = selectedStroke;
 	    		}
 			}
         	else{
-        		s = selectedStroke;
+                currentStroke = selectedStroke;
+                if(dl.currentShape != null){
+                    dl.currentShape.stroke = selectedStroke;
+                }
         	}
-        	pWidth.setText("画笔宽度：1px");
+            pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
         }
         else if(e.getSource() == colorButton){
             setColor();
@@ -638,10 +655,14 @@ public class GraphFrame extends JFrame implements ActionListener{
 			}
 			currentColor = tmpColor;
 			currentColorButton.setBackground(currentColor);
+            if(dl.currentShape != null){
+                dl.currentShape.color = currentColor;
+            }
         }
     }
 
     private void pointer(){
+        System.out.println("dl.currentShape = " + dl.currentShape);
     }
 
     private void eraser() {

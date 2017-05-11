@@ -31,6 +31,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     public boolean first = true;
     public static final int eraserWidth = 10;
     public Shape currentShape;
+    public Shape shapeCopy;
 
     public DrawListener(Graphics g){
         this.g = (Graphics2D)g;
@@ -56,6 +57,8 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
 
     @Override
     public void mousePressed(MouseEvent e) {
+        gf.setFocusable(true);
+//        gf.requestFocusInWindow();
     	gf.requestFocus();
        if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
            ButtonModel bm = bg.getSelection();
@@ -72,28 +75,20 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                }
            }
            else if ("pointer".equals(command)){
+               boolean isContains = false;
         	   for (Shape s : graphicsList) {
         		   if(s.contains(x1, y1)){ // 鼠标点击的坐标在图形内
         			   currentShape = s;
+                       isContains = true;
         		   }
         	   }
+               if(!isContains){
+                   currentShape = null;
+               }
         	   if(currentShape != null){
         		   System.out.print(currentShape + ": ");
                    System.out.println(currentShape.contains(x1, y1));
         	   }
-               ButtonModel bmStroke = wg.getSelection();
-               String commandStroke = bmStroke.getActionCommand();
-               if("small".equals(commandStroke)){
-            	   currentShape.stroke = new BasicStroke(1);
-               }
-               else if("median".equals(commandStroke)){
-            	   currentShape.stroke = new BasicStroke(5);
-               }
-               else if("large".equals(commandStroke)){
-            	   currentShape.stroke = new BasicStroke(10);
-               }
-//               ButtonModel bmColor = cg.getSelection();
-//               String commandColor = bmColor.getActionCommand();
            }
            else {
                System.out.println("================================");
@@ -102,6 +97,9 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                    System.out.println(s.contains(x1, y1));
                }
            }
+       }
+        else{
+           copy();
        }
     }
 
@@ -143,7 +141,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     @Override
     public void mouseEntered(MouseEvent e) {
         color = gf.currentColor;
-        s = gf.s;
+        s = gf.currentStroke;
         g.setColor(color);
         g.setStroke(s);
     }
@@ -254,20 +252,134 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
 
     @Override
     public void keyPressed(KeyEvent e) {
-    	if(currentShape != null && currentShape.contains(x1, y1)){
-			if(e.getKeyChar() == '+'){
-				currentShape.height *= 1.2;
-				currentShape.width *= 1.2;
-	    	}
-	    	else if(e.getKeyChar() == '-'){
-	    		currentShape.height /= 1.2;
-	    		currentShape.width /= 1.2;
-	    	}
-		}
+        if(e.getKeyChar() == '+'){
+            if(currentShape != null && currentShape.contains(x1, y1)) {
+                if(currentShape.getClass() == Rectangle.class || currentShape.getClass() == Oval.class ||
+                        currentShape.getClass() == Font.class){
+                    double heightPower = 1.1;
+                    double widthPower = 1.1;
+                    int originHeight = currentShape.height;
+                    int originWidth = currentShape.width;
+                    if(currentShape.getClass() == Rectangle.class || currentShape.getClass() == Oval.class){
+                        do{
+                            currentShape.height *= heightPower;
+                            heightPower += 0.1;
+                        } while(currentShape.height == originHeight);
+                        do{
+                            currentShape.width *= widthPower;
+                            widthPower += 0.1;
+                        } while(currentShape.width == originWidth);
+                    }
+                    if(currentShape.getClass() == Font.class){
+                        Font font = (Font)currentShape;
+                        font.size++;
+                        System.out.println("size: " + font.size);
+                    }
+                    System.out.println("height: " + currentShape.height);
+                    System.out.println("width: " + currentShape.width);
+                }
+            }
+        }
+        else if(e.getKeyChar() == '-'){
+            if(currentShape != null && currentShape.contains(x1, y1)) {
+                if(currentShape.getClass() == Rectangle.class || currentShape.getClass() == Oval.class ||
+                        currentShape.getClass() == Font.class){
+                    if(currentShape.getClass() == Rectangle.class || currentShape.getClass() == Oval.class){
+                        currentShape.height /= 1.1;
+                        currentShape.width /= 1.1;
+                    }
+                    if(currentShape.getClass() == Font.class){
+                        Font font = (Font)currentShape;
+                        font.size--;
+                        System.out.println("size: " + font.size);
+                    }
+                    System.out.println("height: " + currentShape.height);
+                    System.out.println("width: " + currentShape.width);
+                }
+            }
+        }
+        else if(e.getKeyChar() == 'b'){ // 加粗
+            gf.currentStrokeSize++;
+            Stroke stroke = new BasicStroke(gf.currentStrokeSize);
+            if(currentShape != null && currentShape.contains(x1, y1)) {
+                currentShape.stroke = stroke;
+            }
+            s = stroke;
+            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px");
+        }
+        else if(e.getKeyChar() == 'l'){ // 变细
+            gf.currentStrokeSize--;
+            Stroke stroke = new BasicStroke(gf.currentStrokeSize);
+            if(currentShape != null && currentShape.contains(x1, y1)){
+                currentShape.stroke = stroke;
+            }
+            s = stroke;
+            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px");
+        }
+        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_X){
+            cut();
+        }
+        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C){
+            copy();
+        }
+        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V){
+            paste();
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    private void cut(){
+        if(currentShape != null){
+            for (Shape s: graphicsList){
+                if(s == currentShape){
+                    shapeCopy = s;
+                    graphicsList.remove(s);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void copy(){
+        if(currentShape != null){
+            for (Shape s: graphicsList){
+                if(s == currentShape){
+                    shapeCopy = s;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void paste(){
+        if(shapeCopy != null){
+            Shape tmpShape = null;
+            if(shapeCopy.getClass() == Line.class){
+                tmpShape = new Line();
+            }
+            else if(shapeCopy.getClass() == Rectangle.class){
+                tmpShape = new Rectangle(
+                        x1, y1, (shapeCopy.x2 - x1), (y1 - shapeCopy.y2), Color.BLACK, shapeCopy.stroke);
+            }
+            else if(shapeCopy.getClass() == Oval.class){
+                tmpShape = new Oval(
+                        x1, y1, (shapeCopy.x2 - x1), (y1 - shapeCopy.y2), shapeCopy.color, shapeCopy.stroke);
+            }
+            else if(shapeCopy.getClass() == Font.class){
+                Font f = (Font)shapeCopy;
+                tmpShape = new Font(f.content, x1, y1, shapeCopy.color, shapeCopy.stroke);
+            }
+            if(tmpShape != null){
+                System.out.println("之前：" + graphicsList);
+                System.out.println(tmpShape.x1);
+                System.out.println(tmpShape.y1);
+                graphicsList.add(tmpShape);
+                System.out.println("之后：" + graphicsList);
+            }
+        }
     }
 }

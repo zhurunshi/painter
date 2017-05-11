@@ -6,7 +6,9 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/8.
  */
 public class Font extends Shape{
-    String content; // 文本内容
+    public String content; // 文本内容
+    public int size = 15; // 初始字号为15
+    public int height; // 当前字体高度
 
     public Font(){}
 
@@ -22,11 +24,14 @@ public class Font extends Shape{
     public void draw(Graphics2D g) {
         g.setColor(color);
         g.setStroke(stroke);
+        g.setFont(new java.awt.Font(null, java.awt.Font.PLAIN, size));
         g.drawString(content, x1, y1);
+        height = g.getFontMetrics().getHeight();
+        width = g.getFontMetrics().stringWidth(content);
     }
 
     @Override
     public boolean contains(int x, int y) {
-        return false;
+        return x >= x1 && x <= (x1 + width) && y <= y1 && y >= (y1 - height);
     }
 }

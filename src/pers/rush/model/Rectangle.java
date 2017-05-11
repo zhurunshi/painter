@@ -29,9 +29,10 @@ public class Rectangle extends Shape{
         if(x >= x1 && x <= (x1 + height) && y >= y1 && y <= (y1 + height)){
             return true;
         }
-        if(x >= (x1 - height) && x <= x1 && y >= (y1 - height) && y <= y1){
-            return true;
-        }
+        // 因为规定矩形只从左上往右下画所以不成立
+//        if(x >= (x1 - height) && x <= x1 && y >= (y1 - height) && y <= y1){
+//            return true;
+//        }
         return false;
 	}
 }
