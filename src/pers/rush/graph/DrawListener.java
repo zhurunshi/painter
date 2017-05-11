@@ -60,11 +60,11 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
         gf.setFocusable(true);
 //        gf.requestFocusInWindow();
     	gf.requestFocus();
+    	x1 = e.getX();
+        y1 = e.getY();
        if(e.getButton() == MouseEvent.BUTTON1){ // 鼠标左键
            ButtonModel bm = bg.getSelection();
            command = bm.getActionCommand();
-           x1 = e.getX();
-           y1 = e.getY();
            if ("font".equals(command)) {
                String str;
                str = JOptionPane.showInputDialog(gf, "请输入要插入的文本", "文本", 1);
@@ -80,14 +80,28 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
         		   if(s.contains(x1, y1)){ // 鼠标点击的坐标在图形内
         			   currentShape = s;
                        isContains = true;
+                       break;
         		   }
         	   }
                if(!isContains){
                    currentShape = null;
+                   gf.pShape.setText("选中：");
                }
         	   if(currentShape != null){
         		   System.out.print(currentShape + ": ");
                    System.out.println(currentShape.contains(x1, y1));
+                   if(currentShape.getClass() == Line.class){
+                	   gf.pShape.setText("选中：直线");
+                   }
+                   else if(currentShape.getClass() == Rectangle.class){
+                	   gf.pShape.setText("选中：矩形");
+                   }
+                   else if(currentShape.getClass() == Oval.class){
+                	   gf.pShape.setText("选中：椭圆形");
+                   }
+                   else if(currentShape.getClass() == Font.class){
+                	   gf.pShape.setText("选中：文本");
+                   }
         	   }
            }
            else {
@@ -181,6 +195,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                     graphicsList.add(line);
                     first = false;
                     currentShape = line;
+                    
                 }
                 else{
                     currentShape.x2 = x;
@@ -305,7 +320,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                 currentShape.stroke = stroke;
             }
             s = stroke;
-            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px");
+            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px         ");
         }
         else if(e.getKeyChar() == 'l'){ // 变细
             gf.currentStrokeSize--;
@@ -314,16 +329,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                 currentShape.stroke = stroke;
             }
             s = stroke;
-            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px");
-        }
-        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_X){
-            cut();
-        }
-        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C){
-            copy();
-        }
-        else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V){
-            paste();
+            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px         ");
         }
     }
 
@@ -332,53 +338,67 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
 
     }
 
-    private void cut(){
-        if(currentShape != null){
-            for (Shape s: graphicsList){
-                if(s == currentShape){
-                    shapeCopy = s;
-                    graphicsList.remove(s);
-                    break;
+    protected void cut(){
+    	if("pointer".equals(command)){
+    		if(currentShape != null){
+                for (Shape s: graphicsList){
+                    if(s == currentShape){
+                        shapeCopy = s;
+                        graphicsList.remove(s);
+                        break;
+                    }
                 }
             }
-        }
+    	}
+    	else{
+    		JOptionPane.showMessageDialog(gf, "  请先选择“选取”动作，再选择要操作的图形  ", "提示", 2);
+    	}
     }
 
-    private void copy(){
-        if(currentShape != null){
-            for (Shape s: graphicsList){
-                if(s == currentShape){
-                    shapeCopy = s;
-                    break;
+    protected void copy(){
+    	if("pointer".equals(command)){
+    		if(currentShape != null){
+                for (Shape s: graphicsList){
+                    if(s == currentShape){
+                        shapeCopy = s;
+                        break;
+                    }
                 }
             }
-        }
+    	}
+    	else{
+    		JOptionPane.showMessageDialog(gf, "  请先选择“选取”动作，再选择要操作的图形  ", "提示", 2);
+    	}
     }
 
-    private void paste(){
+    protected void paste(){
         if(shapeCopy != null){
             Shape tmpShape = null;
             if(shapeCopy.getClass() == Line.class){
-                tmpShape = new Line();
+            	int deltaX = x1 - shapeCopy.x1;
+            	int deltaY = y1 - shapeCopy.y1;
+            	System.out.println("deltaX = " + deltaX);
+            	System.out.println("deltaY = " + deltaY);
+                tmpShape = new Line(
+                		x1, y1, shapeCopy.x2 + deltaX, shapeCopy.y2 + deltaY, shapeCopy.color, shapeCopy.stroke);
+                System.out.println("(x1, y1) = " + x1 + "," + y1);
+                System.out.println("(x2, y2) = " + (shapeCopy.x2 + deltaX) + "," + (shapeCopy.y2 + deltaY));
             }
             else if(shapeCopy.getClass() == Rectangle.class){
                 tmpShape = new Rectangle(
-                        x1, y1, (shapeCopy.x2 - x1), (y1 - shapeCopy.y2), Color.BLACK, shapeCopy.stroke);
+                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.stroke);
             }
             else if(shapeCopy.getClass() == Oval.class){
                 tmpShape = new Oval(
-                        x1, y1, (shapeCopy.x2 - x1), (y1 - shapeCopy.y2), shapeCopy.color, shapeCopy.stroke);
+                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.stroke);
             }
             else if(shapeCopy.getClass() == Font.class){
                 Font f = (Font)shapeCopy;
                 tmpShape = new Font(f.content, x1, y1, shapeCopy.color, shapeCopy.stroke);
             }
             if(tmpShape != null){
-                System.out.println("之前：" + graphicsList);
-                System.out.println(tmpShape.x1);
-                System.out.println(tmpShape.y1);
+                tmpShape.draw(g);
                 graphicsList.add(tmpShape);
-                System.out.println("之后：" + graphicsList);
             }
         }
     }

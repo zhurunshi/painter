@@ -2,11 +2,13 @@ package pers.rush.graph;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
-
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import pers.rush.model.Shape;
@@ -79,6 +81,8 @@ public class GraphFrame extends JFrame implements ActionListener{
     Stack<Shape> redoStack = new Stack<>();
     // 是否全选变量
     boolean selectAll = false;
+    // 文件
+    File file;
     // 用JPanel作画布
     JPanel pPanel = new JPanel(){
         public void paint(Graphics g){
@@ -423,7 +427,8 @@ public class GraphFrame extends JFrame implements ActionListener{
     JLabel pDimensionIcon = new JLabel(new ImageIcon("resources//images//size.png"));
     JLabel pDimension = new JLabel();
     JLabel pAction = new JLabel("动作：铅笔         ");
-    JLabel pWidth = new JLabel("画笔宽度：1px");
+    JLabel pWidth = new JLabel("画笔宽度：1px         ");
+    JLabel pShape = new JLabel("选中：");
     private void initToolBar(){
         pPanel.addMouseMotionListener(new MouseMotionListener(){
 
@@ -469,6 +474,8 @@ public class GraphFrame extends JFrame implements ActionListener{
         pToolBar.add(pAction);
         pToolBar.addSeparator(new Dimension(16, 16));
         pToolBar.add(pWidth);
+        pToolBar.addSeparator(new Dimension(16, 16));
+        pToolBar.add(pShape);
         pToolBar.setFloatable(false);
     }
 	
@@ -552,13 +559,13 @@ public class GraphFrame extends JFrame implements ActionListener{
             redo();
         }
         else if(e.getSource() == pCut || e.getSource() == cutButton){
-            cut();
+            dl.cut();
         }
         else if(e.getSource() == pCopy || e.getSource() == copyButton){
-            copy();
+            dl.copy();
         }
         else if(e.getSource() == pPaste || e.getSource() == pasteButton){
-            paste();
+            dl.paste();
         }
         else if(e.getSource() == pSelectAll){
             selectAll();
@@ -606,7 +613,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                     dl.currentShape.stroke = selectedStroke;
                 }
         	}
-        	pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
+        	pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
         }
         else if(e.getSource() == medianWidthButton){
             currentStrokeSize = 5;
@@ -622,7 +629,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                     dl.currentShape.stroke = selectedStroke;
                 }
         	}
-            pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
+            pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
         }
         else if(e.getSource() == smallWidthButton){
             currentStrokeSize = 1;
@@ -638,7 +645,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                     dl.currentShape.stroke = selectedStroke;
                 }
         	}
-            pWidth.setText("画笔宽度：" + currentStrokeSize + "px");
+            pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
         }
         else if(e.getSource() == colorButton){
             setColor();
@@ -748,15 +755,63 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void save() {
-    	if( !(graphicsList.isEmpty() && textList.isEmpty()) ){
+    	if(file != null){
+    		BufferedImage bufferedImage = createImage(pPanel);
+        	try {
+				ImageIO.write(bufferedImage, "png", file);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	else{
+    		JFileChooser fileChooser = new JFileChooser();
+    		int returnValue = fileChooser.showSaveDialog(this);
+    		if(returnValue==JFileChooser.APPROVE_OPTION){
+    			file = fileChooser.getSelectedFile();
+    			BufferedImage bufferedImage = createImage(pPanel);
+    			try {
+					ImageIO.write(bufferedImage, "png", file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					file = null;
+					e.printStackTrace();
+				}
+    		}
+    	}
+    }
+    
+    private BufferedImage createImage(JPanel p) {
+		// TODO Auto-generated method stub
+    	int totalWidth = p.getPreferredSize().width;
+    	int totalHeight = p.getPreferredSize().height;
+    	BufferedImage panelImage = new BufferedImage(
+    			totalWidth, totalHeight, BufferedImage.TYPE_INT_RGB);
+    	Graphics2D g2d = (Graphics2D) panelImage.createGraphics();
+    	g2d.setColor(Color.WHITE);
+    	g2d.fillRect(0, 0, totalWidth, totalHeight);
+    	g2d.translate(0, 0);
+    	p.paint(g2d);
+    	g2d.dispose();
+    	return panelImage;
+	}
+
+	private void open() {
+    	if( !graphicsList.isEmpty() ){
     		
     	}
     }
 
-    private void open() {
-    }
-
     private void newFile() {
+    	if( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ){
+    		graphicsList.clear();
+    	}
+    	else{
+    		/* 弹出是否保存，如果选是，保存文件之后打开新画布；
+    		 * 如果选否，不保存文件直接打开新画布；
+    		 * 如果选取消，关闭对话框
+    		 */
+    	}
     }
 
 }
