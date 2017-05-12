@@ -1,4 +1,4 @@
-package pers.rush.tool;
+package pers.rush.widget;
 
 import javax.swing.JMenu;
 

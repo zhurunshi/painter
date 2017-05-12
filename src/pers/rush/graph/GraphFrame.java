@@ -11,12 +11,13 @@ import java.util.Stack;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import pers.rush.model.Image;
 import pers.rush.model.Shape;
-import pers.rush.tool.PainterRadioButton;
-import pers.rush.tool.PainterButton;
-import pers.rush.tool.PainterLabel;
-import pers.rush.tool.PainterMenu;
-import pers.rush.tool.Text;
+import pers.rush.util.StreamUtils;
+import pers.rush.widget.PainterRadioButton;
+import pers.rush.widget.PainterButton;
+import pers.rush.widget.PainterLabel;
+import pers.rush.widget.PainterMenu;
 
 public class GraphFrame extends JFrame implements ActionListener{
 	// 菜单栏
@@ -75,14 +76,14 @@ public class GraphFrame extends JFrame implements ActionListener{
 	}
 	// 放图形的容器
     ArrayList<Shape> graphicsList = new ArrayList<>();
-    // 放文字的容器
-    ArrayList<Text> textList = new ArrayList<>();
     // 放恢复图形的容器
     Stack<Shape> redoStack = new Stack<>();
     // 是否全选变量
     boolean selectAll = false;
     // 文件
     File file;
+    // 文件名
+    String fileName = "无标题";
     // 用JPanel作画布
     JPanel pPanel = new JPanel(){
         public void paint(Graphics g){
@@ -91,11 +92,6 @@ public class GraphFrame extends JFrame implements ActionListener{
             for(Shape s : graphicsList){
                 s.draw(g2d);
             }
-//            for(int i = 0; i < textList.size(); ++i){
-//            	Text t = (Text)textList.get(i);
-//                Shape
-//            	g2d.drawString(t.getContent(), t.getX(), t.getY());
-//            }
             repaint();
         }
     };
@@ -504,6 +500,14 @@ public class GraphFrame extends JFrame implements ActionListener{
         setLocation((int)(dm.getWidth() - getWidth()) / 2,
                 (int)(dm.getHeight() - getHeight() - taskBarHeight) / 2);
     }
+
+    private void initWindowClose(){
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent paramAnonymousWindowEvent) {
+                exit();
+            }
+        });
+    }
 	
 	// 程序初始化
 	private void initProcedure(){
@@ -522,7 +526,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 //        gf.setIconImage(image);
 //        gf.setVisible(true);
         setIconImage(getToolkit().getImage("resources//images//icon.png"));
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置点击X按钮关闭程序
+        initWindowClose();
     }
 	
 	public GraphFrame(String title){
@@ -737,13 +741,39 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void about() {
+        JOptionPane.showMessageDialog(this, "" +
+                "画图\n" +
+                "版本 0.1\n" +
+                "版权所有 © 2017 Rush Chuh。保留所有权利。\n" +
+                "E-mail: rushzhu95@hotmail.com", "关于“画图”", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void help() {
     }
 
     private void exit() {
-        System.exit(0);
+        if( !( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ) ){
+            /* 弹出是否保存，如果选是，保存文件之后退出；
+    		 * 如果选否，不保存文件直接退出；
+    		 * 如果选取消，关闭对话框
+    		 */
+            int returnValue = JOptionPane.showConfirmDialog(
+                    this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
+            if( returnValue == JOptionPane.YES_OPTION ){
+                if( save() ){
+                    System.exit(0);
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+            else if(returnValue == JOptionPane.NO_OPTION){
+                System.exit(0);
+            }
+        }
+        else{
+            System.exit(0);
+        }
     }
 
     private void setBgColor() {
@@ -754,67 +784,138 @@ public class GraphFrame extends JFrame implements ActionListener{
         }
     }
 
-    private void save() {
+    private boolean save() {
+        boolean res = false;
     	if(file != null){
-    		BufferedImage bufferedImage = createImage(pPanel);
-        	try {
-				ImageIO.write(bufferedImage, "png", file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//    		BufferedImage bufferedImage = createImage(pPanel);
+//        	try {
+//				res = ImageIO.write(bufferedImage, "png", file);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+            res = StreamUtils.writeObject(graphicsList, file);
     	}
     	else{
     		JFileChooser fileChooser = new JFileChooser();
     		int returnValue = fileChooser.showSaveDialog(this);
     		if(returnValue==JFileChooser.APPROVE_OPTION){
     			file = fileChooser.getSelectedFile();
-    			BufferedImage bufferedImage = createImage(pPanel);
-    			try {
-					ImageIO.write(bufferedImage, "png", file);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					file = null;
-					e.printStackTrace();
-				}
+                res = StreamUtils.writeObject(graphicsList, file);
+                if( !res ){
+                    file = null;
+                }
+//    			BufferedImage bufferedImage = createImage(pPanel);
+//    			try {
+//					res = ImageIO.write(bufferedImage, "png", file);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					file = null;
+//					e.printStackTrace();
+//				}
     		}
     	}
+        if( file != null ){
+            fileName = file.getName();
+        }
+        else{
+            fileName = "无标题";
+        }
+        this.setTitle(fileName + " - 画图");
+        return res;
     }
     
-    private BufferedImage createImage(JPanel p) {
-		// TODO Auto-generated method stub
-    	int totalWidth = p.getPreferredSize().width;
-    	int totalHeight = p.getPreferredSize().height;
-    	BufferedImage panelImage = new BufferedImage(
-    			totalWidth, totalHeight, BufferedImage.TYPE_INT_RGB);
-    	Graphics2D g2d = (Graphics2D) panelImage.createGraphics();
-    	g2d.setColor(Color.WHITE);
-    	g2d.fillRect(0, 0, totalWidth, totalHeight);
-    	g2d.translate(0, 0);
-    	p.paint(g2d);
-    	g2d.dispose();
-    	return panelImage;
-	}
+//    private BufferedImage createImage(JPanel p) {
+//		// TODO Auto-generated method stub
+//    	int totalWidth = p.getWidth();
+//    	int totalHeight = p.getHeight();
+//        BufferedImage panelImage = new BufferedImage(
+//    			totalWidth, totalHeight, BufferedImage.TYPE_INT_RGB);
+//    	Graphics2D g2d = panelImage.createGraphics();
+//    	g2d.setColor(Color.WHITE);
+//    	g2d.fillRect(0, 0, totalWidth, totalHeight);
+//    	g2d.translate(0, 0);
+//    	p.paint(g2d);
+//    	g2d.dispose();
+//    	return panelImage;
+//	}
 
 	private void open() {
+        /* 如果当前画布上没有任何内容，直接打开文件；
+         * 否则，先保存，再打开文件。
+         */
 		if( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ){
 			// 直接打开
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(this);
+            if( returnValue == JFileChooser.APPROVE_OPTION ){
+                file = fileChooser.getSelectedFile();
+                graphicsList = (ArrayList<Shape>) StreamUtils.<Shape>readObjectForList(file);
+
+
+                //
+                BufferedImage bufferedImage = null;
+                try{
+                    bufferedImage = ImageIO.read(file);
+                } catch (IOException e){
+                    file = null;
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
+                }
+                if( bufferedImage != null ){
+                    Shape image = new Image(0, 0, bufferedImage);
+                    image.draw(dl.g);
+                    graphicsList.add(image);
+                }
+            }
     	}
 		else{
-			
+            if( save() ){
+                pPanel.setBackground(Color.WHITE);
+                graphicsList.clear();
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+            }
 		}
+        if( file != null ){
+            fileName = file.getName();
+        }
+        else{
+            fileName = "无标题";
+        }
+        this.setTitle(fileName + " - 画图");
     }
 
     private void newFile() {
-    	if( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ){
-    		graphicsList.clear();
-    	}
-    	else{
-    		/* 弹出是否保存，如果选是，保存文件之后打开新画布；
+    	if( !( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ) ){
+            /* 弹出是否保存，如果选是，保存文件之后打开新画布；
     		 * 如果选否，不保存文件直接打开新画布；
-    		 * 如果选取消，关闭对话框
+    		 * 如果选取消，关闭对话框。
     		 */
+            int returnValue = JOptionPane.showConfirmDialog(this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
+            if( returnValue == JOptionPane.YES_OPTION ){
+                if( save() ){
+                    pPanel.setBackground(Color.WHITE);
+                    graphicsList.clear();
+                    file = null;
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+            else if(returnValue == JOptionPane.NO_OPTION){
+                pPanel.setBackground(Color.WHITE);
+                graphicsList.clear();
+                file = null;
+            }
     	}
+        if( file != null ){
+            fileName = file.getName();
+        }
+        else{
+            fileName = "无标题";
+        }
+        this.setTitle(fileName + " - 画图");
     }
-
 }

@@ -1,4 +1,4 @@
-package pers.rush.tool;
+package pers.rush.widget;
 
 import java.awt.Color;
 import java.awt.Dimension;

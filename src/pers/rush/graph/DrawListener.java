@@ -4,13 +4,11 @@ import pers.rush.model.*;
 import pers.rush.model.Font;
 import pers.rush.model.Rectangle;
 import pers.rush.model.Shape;
-import pers.rush.tool.Text;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by ZhuRunShi on 2017/5/4.
@@ -27,7 +25,6 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     public Stroke s = new BasicStroke(1); // 画笔宽度
     public GraphFrame gf;
     public ArrayList<Shape> graphicsList;
-    public ArrayList<Text> textList;
     public boolean first = true;
     public static final int eraserWidth = 10;
     public Shape currentShape;
