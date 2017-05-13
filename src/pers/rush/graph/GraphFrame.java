@@ -20,6 +20,10 @@ import pers.rush.widget.PainterLabel;
 import pers.rush.widget.PainterMenu;
 
 public class GraphFrame extends JFrame implements ActionListener{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3188364536411877800L;
 	// 菜单栏
 	JMenuBar pMenuBar = new JMenuBar();
 	// 文件菜单
@@ -72,6 +76,7 @@ public class GraphFrame extends JFrame implements ActionListener{
 
         // 注册监听
         pHelpMenu.addActionListener(this);
+        pHelp.addActionListener(this);
         pAbout.addActionListener(this);
 	}
 	// 放图形的容器
@@ -248,8 +253,7 @@ public class GraphFrame extends JFrame implements ActionListener{
     // 当前画笔颜色
     Color currentColor = Color.BLACK;
     // 当前画笔粗细
-    int currentStrokeSize = 1;
-    Stroke currentStroke = new BasicStroke(currentStrokeSize);
+    int strokeSize = 1;
     // 背景颜色
     Color bgColor;
 
@@ -502,6 +506,11 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void initWindowClose(){
+    	/**
+    	 * 使用下面的方法，仅触发windowClosing方法；
+    	 * 若不使用下面的方法，还会调用dispose()方法会释放屏幕资源，无法做出取消按钮的效果。
+    	 */
+    	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent paramAnonymousWindowEvent) {
                 exit();
@@ -604,52 +613,46 @@ public class GraphFrame extends JFrame implements ActionListener{
             pAction.setText("动作：橡皮擦         ");
         }
         else if(e.getSource() == largeWidthButton){
-            currentStrokeSize = 10;
-        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
+        	strokeSize = 10;
         	if(selectAll){
                 for(Shape s : graphicsList){
-	    			s.stroke = selectedStroke;
+	    			s.strokeSize = strokeSize;
 	    		}
 			}
         	else{
-                currentStroke = selectedStroke;
                 if(dl.currentShape != null){
-                    dl.currentShape.stroke = selectedStroke;
+                    dl.currentShape.strokeSize = strokeSize;
                 }
         	}
-        	pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
+        	pWidth.setText("画笔宽度：" + strokeSize + "px         ");
         }
         else if(e.getSource() == medianWidthButton){
-            currentStrokeSize = 5;
-        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
+        	strokeSize = 5;
         	if(selectAll){
                 for(Shape s : graphicsList){
-	    			s.stroke = selectedStroke;
+	    			s.strokeSize = strokeSize;
 	    		}
 			}
         	else{
-                currentStroke = selectedStroke;
                 if(dl.currentShape != null){
-                    dl.currentShape.stroke = selectedStroke;
+                    dl.currentShape.strokeSize = strokeSize;
                 }
         	}
-            pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
+            pWidth.setText("画笔宽度：" + strokeSize + "px         ");
         }
         else if(e.getSource() == smallWidthButton){
-            currentStrokeSize = 1;
-        	Stroke selectedStroke = new BasicStroke(currentStrokeSize);
+        	strokeSize = 1;
         	if(selectAll){
                 for(Shape s : graphicsList){
-	    			s.stroke = selectedStroke;
+	    			s.strokeSize = strokeSize;
 	    		}
 			}
         	else{
-                currentStroke = selectedStroke;
                 if(dl.currentShape != null){
-                    dl.currentShape.stroke = selectedStroke;
+                    dl.currentShape.strokeSize = strokeSize;
                 }
         	}
-            pWidth.setText("画笔宽度：" + currentStrokeSize + "px         ");
+            pWidth.setText("画笔宽度：" + strokeSize + "px         ");
         }
         else if(e.getSource() == colorButton){
             setColor();
@@ -749,6 +752,32 @@ public class GraphFrame extends JFrame implements ActionListener{
     }
 
     private void help() {
+    	JOptionPane.showMessageDialog(this, "" +
+                "==菜单==\n" +
+                "新建(Ctrl+N)：若画板是空白的，则直接新建；否则会询问您是否保存当前画板，然后新建。\n" +
+                "打开(Ctrl+O)：打开文件，若画板为空，直接打开文件；否则会询问您是否保存当前画板，然后打开文件。\n" +
+                "保存(Ctro+S)：保存当前画板。\n" +
+                "背景颜色：选择画板的背景颜色。注意：该背景是不能被保存的，只能保存当前画布上面的图形。\n" +
+                "退出(Alt+F4)：。\n" +
+                "帮助：查看帮助文档。\n" +
+                "关于：本软件的版权信息。\n" +
+                "==工具==\n" +
+                "剪切、复制(Ctrl+X/C)：用法不多说。注意：要先选择“选取”按钮，然后点击图形，再进行剪切和复制操作。\n" +
+                "粘贴(Ctrl+V)：先点击想要粘贴的位置，然后使用快捷键，或者使用右键菜单中的功能。\n" +
+                "直线：先选择“直线”按钮，然后点击鼠标不放开，拖拽形成一条直线。\n" +
+                "矩形：先选择“矩形”按钮，然后点击鼠标不放开，向右下侧拖拽形成一个矩形。注意：不能向别的方向拖拽。\n" +
+                "椭圆形：先选择“椭圆形”按钮，然后点击鼠标不放开，向右下侧拖拽形成一个椭圆形。注意：不能向别的方向拖拽。\n" +
+                "铅笔：先选择“铅笔”按钮，跟随鼠标路径划线。\n" + 
+                "文本：先选择“文本”按钮，然后点击指定位置插入文本。注意：文本的放大缩小功能使用快捷键(+/-)控制。\n" + 
+                "橡皮擦：先选择“橡皮擦”按钮，擦掉画板上的痕迹。\n" + 
+                "选取：先选择“选取”按钮，然后点击画板上的图形获得选中状态，可以参考下方的提示栏中的提示。\n" + 
+                "粗细：先选择其中一个“粗细”按钮，然后进行图形的绘制，可绘制出指定宽度的图形。于此同时，还可以根据快捷键(b/l)来递增/递减画笔的宽度，达到细微的调整。\n" + 
+                "颜色：可以从给定的色板上选取颜色，也可以自定义颜色，通过右侧的颜色选取按钮进行自定义颜色的选择。\n" + 
+                "撤销/恢复：通过右键菜单或快捷键(Ctrl+Z/Y)进行操作，是图形级的撤销，即不能撤销颜色以及粗细等参数的操作。\n" + 
+                "全选：通过右键菜单或快捷键(Ctrl+A)进行操作，全选完成后，可以批量修改图形的宽度以及颜色等参数。\n" + 
+                "==提示栏==\n" +
+                "画板下方有鼠标的实时坐标、画板尺寸、当前动作、画笔宽度、以及选中图形提示。\n" + 
+                "以上。", "帮助", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void exit() {
@@ -757,19 +786,25 @@ public class GraphFrame extends JFrame implements ActionListener{
     		 * 如果选否，不保存文件直接退出；
     		 * 如果选取消，关闭对话框
     		 */
-            int returnValue = JOptionPane.showConfirmDialog(
-                    this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
-            if( returnValue == JOptionPane.YES_OPTION ){
-                if( save() ){
+        	boolean flag = true;
+        	while(flag){
+        		int returnValue = JOptionPane.showConfirmDialog(
+                        this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
+                if( returnValue == JOptionPane.YES_OPTION ){
+                    if( save() ){
+                        System.exit(0);
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+                else if(returnValue == JOptionPane.NO_OPTION){
                     System.exit(0);
                 }
-                else{
-                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                else if(returnValue == JOptionPane.CANCEL_OPTION){
+                	return;
                 }
-            }
-            else if(returnValue == JOptionPane.NO_OPTION){
-                System.exit(0);
-            }
+        	}
         }
         else{
             System.exit(0);
@@ -850,32 +885,67 @@ public class GraphFrame extends JFrame implements ActionListener{
             int returnValue = fileChooser.showOpenDialog(this);
             if( returnValue == JFileChooser.APPROVE_OPTION ){
                 file = fileChooser.getSelectedFile();
-                graphicsList = (ArrayList<Shape>) StreamUtils.<Shape>readObjectForList(file);
-
-
-                //
-                BufferedImage bufferedImage = null;
-                try{
-                    bufferedImage = ImageIO.read(file);
-                } catch (IOException e){
-                    file = null;
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
+                ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
+                if(!tmpList.isEmpty()){
+                	graphicsList.clear();
+                	for(Shape s : tmpList){
+                		graphicsList.add(s);
+                	}
+                	for(Shape s : graphicsList){
+                		s.draw(dl.g);
+                	}
                 }
-                if( bufferedImage != null ){
-                    Shape image = new Image(0, 0, bufferedImage);
-                    image.draw(dl.g);
-                    graphicsList.add(image);
+                else{
+                	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
                 }
             }
     	}
 		else{
-            if( save() ){
-                pPanel.setBackground(Color.WHITE);
-                graphicsList.clear();
+			int returnValue = JOptionPane.showConfirmDialog(this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
+			if( returnValue == JOptionPane.YES_OPTION ){
+                if( save() ){
+                	JFileChooser fileChooser = new JFileChooser();
+                    returnValue = fileChooser.showOpenDialog(this);
+                    if( returnValue == JFileChooser.APPROVE_OPTION ){
+                        file = fileChooser.getSelectedFile();
+                        ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
+                        if(!tmpList.isEmpty()){
+                        	graphicsList.clear();
+                        	for(Shape s : tmpList){
+                        		graphicsList.add(s);
+                        	}
+                        	for(Shape s : graphicsList){
+                        		s.draw(dl.g);
+                        	}
+                        }
+                        else{
+                        	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
+                        }
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                }
             }
-            else{
-                JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+            else if(returnValue == JOptionPane.NO_OPTION){
+            	JFileChooser fileChooser = new JFileChooser();
+                returnValue = fileChooser.showOpenDialog(this);
+                if( returnValue == JFileChooser.APPROVE_OPTION ){
+                    file = fileChooser.getSelectedFile();
+                    ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
+                    if(!tmpList.isEmpty()){
+                    	graphicsList.clear();
+                    	for(Shape s : tmpList){
+                    		graphicsList.add(s);
+                    	}
+                    	for(Shape s : graphicsList){
+                    		s.draw(dl.g);
+                    	}
+                    }
+                    else{
+                    	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
             }
 		}
         if( file != null ){

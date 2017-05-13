@@ -1,27 +1,32 @@
 package pers.rush.model;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * Created by ZhuRunShi on 2017/5/3.
  */
-public abstract class Shape{
-    public int x1;
+public abstract class Shape implements Serializable{
+	
+	public int x1;
     public int y1;
     public int x2;
     public int y2;
     public int width;
     public int height;
     public Color color; // 画笔颜色
-    public Stroke stroke; // 画笔粗细
-
+    public int strokeSize; // 画笔粗细
+    
     public Shape() {}
 
-    public Shape(int x1, int y1, Color color, Stroke stroke) {
+    public Shape(int x1, int y1, Color color, int strokeSize) {
         this.x1 = x1;
         this.y1 = y1;
         this.color = color;
-        this.stroke = stroke;
+        this.strokeSize = strokeSize;
     }
 
     public abstract void draw(Graphics2D g);

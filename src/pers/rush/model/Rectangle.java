@@ -5,13 +5,13 @@ import java.awt.*;
 /**
  * Created by ZhuRunShi on 2017/5/3.
  */
-public class Rectangle extends Shape{
+public class Rectangle extends Shape {
     public Rectangle(){
     	super();
     }
 
-    public Rectangle(int x1, int y1, int width, int height, Color color, Stroke stroke){
-        super(x1, y1, color, stroke);
+    public Rectangle(int x1, int y1, int width, int height, Color color, int strokeSize){
+        super(x1, y1, color, strokeSize);
         this.width = width;
         this.height = height;
     }
@@ -19,7 +19,7 @@ public class Rectangle extends Shape{
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
-        g.setStroke(stroke);
+        g.setStroke(new BasicStroke(strokeSize));
         g.drawRect(x1, y1, width, height);
     }
     

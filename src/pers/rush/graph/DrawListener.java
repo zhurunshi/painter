@@ -22,7 +22,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     public ButtonGroup cg; // 颜色组
     public String command;
     public Color color; // 画笔颜色
-    public Stroke s = new BasicStroke(1); // 画笔宽度
+    public int strokeSize = 1; // 画笔宽度
     public GraphFrame gf;
     public ArrayList<Shape> graphicsList;
     public boolean first = true;
@@ -66,7 +66,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
                String str;
                str = JOptionPane.showInputDialog(gf, "请输入要插入的文本", "文本", 1);
                if (str != null) {
-                   Shape font = new Font(str, x1, y1, g.getColor(), s);
+                   Shape font = new Font(str, x1, y1, g.getColor(), strokeSize);
                    font.draw(g);
                    graphicsList.add(font);
                }
@@ -152,9 +152,9 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     @Override
     public void mouseEntered(MouseEvent e) {
         color = gf.currentColor;
-        s = gf.currentStroke;
+        strokeSize = gf.strokeSize;
         g.setColor(color);
-        g.setStroke(s);
+        g.setStroke(new BasicStroke(strokeSize));
     }
 
     @Override
@@ -169,7 +169,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
     		int x = e.getX();
             int y = e.getY();
             if("pencil".equals(command)){
-                Shape line = new Line(x1, y1, x, y, g.getColor(), s);
+                Shape line = new Line(x1, y1, x, y, g.getColor(), strokeSize);
                 line.draw(g);
                 graphicsList.add(line);
                 x1 = x;
@@ -178,7 +178,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             else if("eraser".equals(command)){
                 g.setColor(Color.WHITE);
                 g.setStroke(new BasicStroke(eraserWidth));
-                Shape line = new Line(x1, y1, x, y, g.getColor(), new BasicStroke(eraserWidth));
+                Shape line = new Line(x1, y1, x, y, g.getColor(), eraserWidth);
                 line.draw(g);
                 graphicsList.add(line);
 
@@ -187,7 +187,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             }
             else if("line".equals(command)){
                 if(first){
-                    Shape line = new Line(x1, y1, x1, y1, g.getColor(), s);
+                    Shape line = new Line(x1, y1, x1, y1, g.getColor(), strokeSize);
                     line.draw(g);
                     graphicsList.add(line);
                     first = false;
@@ -202,7 +202,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             else if("rectangle".equals(command)){
                 if(first){
                     Shape rect = new Rectangle(
-                            x1, y1, (x2 - x1), (y1 - y2), g.getColor(), s);
+                            x1, y1, (x2 - x1), (y1 - y2), g.getColor(), strokeSize);
 //                    Shape rect = new Rectangle(
 //                            Math.min(x2, x1), Math.min(y2, y1), Math.abs(x2 - x1), Math.abs(y1 - y2), g.getColor(), s);
                     rect.draw(g);
@@ -218,7 +218,7 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             else if("oval".equals(command)){
                 if(first){
                     Shape oval = new Oval(
-                            x1, y1, (x2 - x1), (y1 - y2), g.getColor(), s);
+                            x1, y1, (x2 - x1), (y1 - y2), g.getColor(), strokeSize);
 //                    Shape oval = new Oval(
 //                            Math.min(x2, x1), Math.min(y2, y1), Math.abs(x2 - x1), Math.abs(y1 - y2), g.getColor(), s);
                     oval.draw(g);
@@ -311,22 +311,21 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             }
         }
         else if(e.getKeyChar() == 'b'){ // 加粗
-            gf.currentStrokeSize++;
-            Stroke stroke = new BasicStroke(gf.currentStrokeSize);
+            gf.strokeSize++;
+            strokeSize = gf.strokeSize;
             if(currentShape != null && currentShape.contains(x1, y1)) {
-                currentShape.stroke = stroke;
+                currentShape.strokeSize = strokeSize;
             }
-            s = stroke;
-            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px         ");
+            strokeSize = gf.strokeSize;
+            gf.pWidth.setText("画笔宽度：" + gf.strokeSize + "px         ");
         }
         else if(e.getKeyChar() == 'l'){ // 变细
-            gf.currentStrokeSize--;
-            Stroke stroke = new BasicStroke(gf.currentStrokeSize);
+            gf.strokeSize--;
+            strokeSize = gf.strokeSize;
             if(currentShape != null && currentShape.contains(x1, y1)){
-                currentShape.stroke = stroke;
+                currentShape.strokeSize = strokeSize;
             }
-            s = stroke;
-            gf.pWidth.setText("画笔宽度：" + gf.currentStrokeSize + "px         ");
+            gf.pWidth.setText("画笔宽度：" + gf.strokeSize + "px         ");
         }
     }
 
@@ -377,21 +376,21 @@ public class DrawListener implements MouseListener, MouseMotionListener, KeyList
             	System.out.println("deltaX = " + deltaX);
             	System.out.println("deltaY = " + deltaY);
                 tmpShape = new Line(
-                		x1, y1, shapeCopy.x2 + deltaX, shapeCopy.y2 + deltaY, shapeCopy.color, shapeCopy.stroke);
+                		x1, y1, shapeCopy.x2 + deltaX, shapeCopy.y2 + deltaY, shapeCopy.color, shapeCopy.strokeSize);
                 System.out.println("(x1, y1) = " + x1 + "," + y1);
                 System.out.println("(x2, y2) = " + (shapeCopy.x2 + deltaX) + "," + (shapeCopy.y2 + deltaY));
             }
             else if(shapeCopy.getClass() == Rectangle.class){
                 tmpShape = new Rectangle(
-                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.stroke);
+                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.strokeSize);
             }
             else if(shapeCopy.getClass() == Oval.class){
                 tmpShape = new Oval(
-                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.stroke);
+                        x1, y1, shapeCopy.width, shapeCopy.height, shapeCopy.color, shapeCopy.strokeSize);
             }
             else if(shapeCopy.getClass() == Font.class){
                 Font f = (Font)shapeCopy;
-                tmpShape = new Font(f.content, x1, y1, shapeCopy.color, shapeCopy.stroke);
+                tmpShape = new Font(f.content, x1, y1, shapeCopy.color, shapeCopy.strokeSize);
             }
             if(tmpShape != null){
                 tmpShape.draw(g);

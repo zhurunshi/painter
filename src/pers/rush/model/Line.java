@@ -10,8 +10,8 @@ public class Line extends Shape {
         super();
     }
 
-    public Line(int x1, int y1, int x2, int y2, Color color, Stroke stroke){
-        super(x1, y1, color, stroke);
+    public Line(int x1, int y1, int x2, int y2, Color color, int strokeSize){
+        super(x1, y1, color, strokeSize);
         this.x2 = x2;
         this.y2 = y2;
     }
@@ -19,7 +19,7 @@ public class Line extends Shape {
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
-        g.setStroke(stroke);
+        g.setStroke(new BasicStroke(strokeSize));
         g.drawLine(x1, y1, x2, y2);
     }
 

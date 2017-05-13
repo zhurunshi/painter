@@ -12,18 +12,18 @@ public class Font extends Shape{
 
     public Font(){}
 
-    public Font(String content, int x1, int y1, Color color, Stroke stroke){
+    public Font(String content, int x1, int y1, Color color, int strokeSize){
         this.content = content;
         this.x1 = x1;
         this.y1 = y1;
         this.color = color;
-        this.stroke = stroke;
+        this.strokeSize = strokeSize;
     }
 
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
-        g.setStroke(stroke);
+        g.setStroke(new BasicStroke(strokeSize));
         g.setFont(new java.awt.Font(null, java.awt.Font.PLAIN, size));
         g.drawString(content, x1, y1);
         height = g.getFontMetrics().getHeight();

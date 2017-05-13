@@ -10,8 +10,8 @@ public class Oval extends Shape{
         super();
     }
 
-    public Oval(int x1, int y1, int width, int height, Color color, Stroke stroke){
-        super(x1, y1, color, stroke);
+    public Oval(int x1, int y1, int width, int height, Color color, int strokeSize){
+        super(x1, y1, color, strokeSize);
         this.width = width;
         this.height = height;
     }
@@ -19,7 +19,7 @@ public class Oval extends Shape{
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
-        g.setStroke(stroke);
+        g.setStroke(new BasicStroke(strokeSize));
         g.drawOval(x1, y1, width, height);
     }
     
