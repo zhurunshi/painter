@@ -786,25 +786,19 @@ public class GraphFrame extends JFrame implements ActionListener{
     		 * 如果选否，不保存文件直接退出；
     		 * 如果选取消，关闭对话框
     		 */
-        	boolean flag = true;
-        	while(flag){
-        		int returnValue = JOptionPane.showConfirmDialog(
-                        this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
-                if( returnValue == JOptionPane.YES_OPTION ){
-                    if( save() ){
-                        System.exit(0);
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
-                    }
-                }
-                else if(returnValue == JOptionPane.NO_OPTION){
+            int returnValue = JOptionPane.showConfirmDialog(
+                    this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
+            if( returnValue == JOptionPane.YES_OPTION ){
+                if( save() ){
                     System.exit(0);
                 }
-                else if(returnValue == JOptionPane.CANCEL_OPTION){
-                	return;
+                else{
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
                 }
-        	}
+            }
+            else if(returnValue == JOptionPane.NO_OPTION){
+                System.exit(0);
+            }
         }
         else{
             System.exit(0);
@@ -875,77 +869,46 @@ public class GraphFrame extends JFrame implements ActionListener{
 //    	return panelImage;
 //	}
 
+    private void openCore(JFileChooser fileChooser){
+        int returnValue = fileChooser.showOpenDialog(this);
+        if( returnValue == JFileChooser.APPROVE_OPTION ){
+            file = fileChooser.getSelectedFile();
+            ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
+            if(!tmpList.isEmpty()){
+                graphicsList.clear();
+                for(Shape s : tmpList){
+                    graphicsList.add(s);
+                }
+                for(Shape s : graphicsList){
+                    s.draw(dl.g);
+                }
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
 	private void open() {
         /* 如果当前画布上没有任何内容，直接打开文件；
          * 否则，先保存，再打开文件。
          */
+        JFileChooser fileChooser = new JFileChooser();
 		if( pPanel.getBackground() == Color.WHITE && graphicsList.isEmpty() ){
-			// 直接打开
-            JFileChooser fileChooser = new JFileChooser();
-            int returnValue = fileChooser.showOpenDialog(this);
-            if( returnValue == JFileChooser.APPROVE_OPTION ){
-                file = fileChooser.getSelectedFile();
-                ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
-                if(!tmpList.isEmpty()){
-                	graphicsList.clear();
-                	for(Shape s : tmpList){
-                		graphicsList.add(s);
-                	}
-                	for(Shape s : graphicsList){
-                		s.draw(dl.g);
-                	}
-                }
-                else{
-                	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
-                }
-            }
+            openCore(fileChooser);
     	}
 		else{
 			int returnValue = JOptionPane.showConfirmDialog(this, "您想将更改保存到 " + fileName + " 吗？", "画图", JOptionPane.YES_NO_CANCEL_OPTION);
 			if( returnValue == JOptionPane.YES_OPTION ){
                 if( save() ){
-                	JFileChooser fileChooser = new JFileChooser();
-                    returnValue = fileChooser.showOpenDialog(this);
-                    if( returnValue == JFileChooser.APPROVE_OPTION ){
-                        file = fileChooser.getSelectedFile();
-                        ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
-                        if(!tmpList.isEmpty()){
-                        	graphicsList.clear();
-                        	for(Shape s : tmpList){
-                        		graphicsList.add(s);
-                        	}
-                        	for(Shape s : graphicsList){
-                        		s.draw(dl.g);
-                        	}
-                        }
-                        else{
-                        	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
-                        }
-                    }
+                    openCore(fileChooser);
                 }
                 else{
                     JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if(returnValue == JOptionPane.NO_OPTION){
-            	JFileChooser fileChooser = new JFileChooser();
-                returnValue = fileChooser.showOpenDialog(this);
-                if( returnValue == JFileChooser.APPROVE_OPTION ){
-                    file = fileChooser.getSelectedFile();
-                    ArrayList<Shape> tmpList = new ArrayList<Shape>( StreamUtils.<Shape>readObjectForList(file) );
-                    if(!tmpList.isEmpty()){
-                    	graphicsList.clear();
-                    	for(Shape s : tmpList){
-                    		graphicsList.add(s);
-                    	}
-                    	for(Shape s : graphicsList){
-                    		s.draw(dl.g);
-                    	}
-                    }
-                    else{
-                    	JOptionPane.showMessageDialog(this, "文件打开过程中出现异常，文件打开失败", "提示", JOptionPane.WARNING_MESSAGE);
-                    }
-                }
+                openCore(fileChooser);
             }
 		}
         if( file != null ){
@@ -986,6 +949,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         else{
             fileName = "无标题";
         }
-        this.setTitle(fileName + " - 画图");
+        this.setTitle( fileName + " - 画图" );
     }
 }

@@ -8,7 +8,6 @@ import java.awt.*;
 public class Font extends Shape{
     public String content; // 文本内容
     public int size = 15; // 初始字号为15
-    public int height; // 当前字体高度
 
     public Font(){}
 
