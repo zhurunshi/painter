@@ -11,9 +11,4 @@ public class PainterMenu extends JMenu {
 		setMnemonic(mnemonic);
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -2,16 +2,14 @@ package pers.rush.graph;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import pers.rush.model.Image;
+import pers.rush.main.Main;
 import pers.rush.model.Shape;
 import pers.rush.util.StreamUtils;
 import pers.rush.widget.PainterRadioButton;
@@ -20,10 +18,7 @@ import pers.rush.widget.PainterLabel;
 import pers.rush.widget.PainterMenu;
 
 public class GraphFrame extends JFrame implements ActionListener{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3188364536411877800L;
+	
 	// 菜单栏
 	JMenuBar pMenuBar = new JMenuBar();
 	// 文件菜单
@@ -56,11 +51,12 @@ public class GraphFrame extends JFrame implements ActionListener{
         pBgColor.addActionListener(this);
         pExit.addActionListener(this);
 		// 添加图标
-		ImageIcon newIcon = new ImageIcon("resources//images//new.png");
+//		ImageIcon newIcon = new ImageIcon("resources//images//new.png");
+		ImageIcon newIcon = new ImageIcon(Main.class.getResource("../../../resources/images/new.png"));
 		pNew.setIcon(newIcon);
-		ImageIcon openIcon = new ImageIcon("resources//images//open.png");
+		ImageIcon openIcon = new ImageIcon(Main.class.getResource("../../../resources/images/open.png"));
 		pOpen.setIcon(openIcon);
-		ImageIcon saveIcon = new ImageIcon("resources//images//save.png");
+		ImageIcon saveIcon = new ImageIcon(Main.class.getResource("../../../resources/images/save.png"));
 		pSave.setIcon(saveIcon);
 		// 快捷键
 		pNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK));
@@ -149,15 +145,15 @@ public class GraphFrame extends JFrame implements ActionListener{
         pPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,InputEvent.CTRL_DOWN_MASK));
         pSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.CTRL_DOWN_MASK));
         // 添加图标
-        ImageIcon undoIcon = new ImageIcon("resources//images//undo.png");
+        ImageIcon undoIcon = new ImageIcon(Main.class.getResource("../../../resources/images/undo.png"));
         pUndo.setIcon(undoIcon);
-        ImageIcon redoIcon = new ImageIcon("resources//images//redo.png");
+        ImageIcon redoIcon = new ImageIcon(Main.class.getResource("../../../resources/images/redo.png"));
         pRedo.setIcon(redoIcon);
-        ImageIcon cutIcon = new ImageIcon("resources//images//cut.png");
+        ImageIcon cutIcon = new ImageIcon(Main.class.getResource("../../../resources/images/cut.png"));
         pCut.setIcon(cutIcon);
-        ImageIcon copyIcon = new ImageIcon("resources//images//copy.png");
+        ImageIcon copyIcon = new ImageIcon(Main.class.getResource("../../../resources/images/copy.png"));
         pCopy.setIcon(copyIcon);
-        ImageIcon pasteIcon = new ImageIcon("resources//images//paste.png");
+        ImageIcon pasteIcon = new ImageIcon(Main.class.getResource("../../../resources/images/paste.png"));
         pPaste.setIcon(pasteIcon);
         // 注册监听
         pUndo.addActionListener(this);
@@ -195,38 +191,38 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 工具栏
     PainterRadioButton cutButton = new PainterRadioButton(
-            new ImageIcon("resources//images//cut.png"), "剪切");
+            new ImageIcon(Main.class.getResource("../../../resources/images/cut.png")), "剪切");
     PainterRadioButton copyButton = new PainterRadioButton(
-            new ImageIcon("resources//images//copy.png"), "复制");
+            new ImageIcon(Main.class.getResource("../../../resources/images/copy.png")), "复制");
     PainterRadioButton pasteButton = new PainterRadioButton(
-            new ImageIcon("resources//images//paste.png"), "粘贴");
+            new ImageIcon(Main.class.getResource("../../../resources/images/paste.png")), "粘贴");
     PainterRadioButton lineButton = new PainterRadioButton(
-            new ImageIcon("resources//images//line.png"), "直线");
+            new ImageIcon(Main.class.getResource("../../../resources/images/line.png")), "直线");
     PainterRadioButton rectangleButton = new PainterRadioButton(
-            new ImageIcon("resources//images//rectangle.png"), "矩形");
+            new ImageIcon(Main.class.getResource("../../../resources/images/rectangle.png")), "矩形");
     PainterRadioButton ovalButton = new PainterRadioButton(
-            new ImageIcon("resources//images//oval.png"), "椭圆形");
-    ImageIcon pencilIcon = new ImageIcon("resources//images//pencil.png");
+            new ImageIcon(Main.class.getResource("../../../resources/images/oval.png")), "椭圆形");
+    ImageIcon pencilIcon = new ImageIcon(Main.class.getResource("../../../resources/images/pencil.png"));
     PainterRadioButton pencilButton = new PainterRadioButton(
             pencilIcon, "铅笔");
-    ImageIcon eraserIcon = new ImageIcon("resources//images//eraser.png");
+    ImageIcon eraserIcon = new ImageIcon(Main.class.getResource("../../../resources/images/eraser.png"));
     PainterRadioButton eraserButton = new PainterRadioButton(
             eraserIcon, "橡皮擦");
     PainterRadioButton fontButton = new PainterRadioButton(
-            new ImageIcon("resources//images//font.png"), "文本");
+            new ImageIcon(Main.class.getResource("../../../resources/images/font.png")), "文本");
     PainterRadioButton pointerButton = new PainterRadioButton(
-            new ImageIcon("resources//images//pointer.png"), "选取");
+            new ImageIcon(Main.class.getResource("../../../resources/images/pointer.png")), "选取");
     PainterRadioButton smallWidthButton = new PainterRadioButton(
-    		new ImageIcon("resources//images//small.png"), "小");
+    		new ImageIcon(Main.class.getResource("../../../resources/images/small.png")), "小");
     PainterRadioButton medianWidthButton = new PainterRadioButton(
-    		new ImageIcon("resources//images//median.png"), "中");
+    		new ImageIcon(Main.class.getResource("../../../resources/images/median.png")), "中");
     PainterRadioButton largeWidthButton = new PainterRadioButton(
-    		new ImageIcon("resources//images//large.png"), "大");
+    		new ImageIcon(Main.class.getResource("../../../resources/images/large.png")), "大");
 //    PainterRadioButton widthButton = new PainterRadioButton(
 //            new ImageIcon("resources//images//width.png"), "粗细");
     PainterButton currentColorButton = new PainterButton("", Color.BLACK);
     PainterRadioButton colorButton = new PainterRadioButton(
-            new ImageIcon("resources//images//color_32px.png"), "更多颜色");
+            new ImageIcon(Main.class.getResource("../../../resources/images/color_32px.png")), "更多颜色");
 
     private void initWidthMenu(){
         pWidthButtons.add(smallWidthButton);
@@ -421,10 +417,10 @@ public class GraphFrame extends JFrame implements ActionListener{
 
     // 显示坐标栏
     JToolBar pToolBar = new JToolBar("坐标栏");
-    JLabel pPositionIcon = new JLabel(new ImageIcon("resources//images//coord.png"));
+    JLabel pPositionIcon = new JLabel(new ImageIcon(Main.class.getResource("../../../resources/images/coord.png")));
     JLabel pPosition = new JLabel("                      ");
 
-    JLabel pDimensionIcon = new JLabel(new ImageIcon("resources//images//size.png"));
+    JLabel pDimensionIcon = new JLabel(new ImageIcon(Main.class.getResource("../../../resources/images/size.png")));
     JLabel pDimension = new JLabel();
     JLabel pAction = new JLabel("动作：铅笔         ");
     JLabel pWidth = new JLabel("画笔宽度：1px         ");
@@ -530,11 +526,11 @@ public class GraphFrame extends JFrame implements ActionListener{
 		setSize(1100,600); // 设置窗口大小
         centerWindow(); // 窗口居中函数
 		initStyle(); // 初始化风格
-//        Toolkit toolkit = gf.getToolkit();
-//        Image image = toolkit.getImage("resources//images//icon.png");
-//        gf.setIconImage(image);
-//        gf.setVisible(true);
-        setIconImage(getToolkit().getImage("resources//images//icon.png"));
+		// 报错导致无法关闭程序，故注释掉
+//		setIconImage(
+//				Toolkit.getDefaultToolkit().getImage(
+//						Main.class.getResource(
+//								"../../../resources/images/icon_2g.png")));
         initWindowClose();
     }
 	
@@ -746,9 +742,10 @@ public class GraphFrame extends JFrame implements ActionListener{
     private void about() {
         JOptionPane.showMessageDialog(this, "" +
                 "画图\n" +
-                "版本 0.1\n" +
+                "版本 1.0\n" +
                 "版权所有 © 2017 Rush Chuh。保留所有权利。\n" +
-                "E-mail: rushzhu95@hotmail.com", "关于“画图”", JOptionPane.PLAIN_MESSAGE);
+                "E-mail: rushzhu95@hotmail.com\n" +
+                "Website: http://zhurunshi.com/", "关于“画图”", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void help() {
@@ -793,7 +790,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                     System.exit(0);
                 }
                 else{
-                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请重新尝试保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if(returnValue == JOptionPane.NO_OPTION){
@@ -827,9 +824,16 @@ public class GraphFrame extends JFrame implements ActionListener{
     	}
     	else{
     		JFileChooser fileChooser = new JFileChooser();
+        	FileNameExtensionFilter filter = new FileNameExtensionFilter("CAD (*.cad)", "cad");
+        	fileChooser.setSelectedFile(new File("无标题.cad"));
+        	fileChooser.setFileFilter(filter);
     		int returnValue = fileChooser.showSaveDialog(this);
     		if(returnValue==JFileChooser.APPROVE_OPTION){
     			file = fileChooser.getSelectedFile();
+    			String fileName = file.getName();
+    			if(fileName.indexOf(".cad") < 0){
+    				file = new File(fileChooser.getCurrentDirectory(), fileName + ".cad");
+    			}
                 res = StreamUtils.writeObject(graphicsList, file);
                 if( !res ){
                     file = null;
@@ -870,6 +874,8 @@ public class GraphFrame extends JFrame implements ActionListener{
 //	}
 
     private void openCore(JFileChooser fileChooser){
+    	FileNameExtensionFilter filter = new FileNameExtensionFilter("CAD (*.cad)", "cad");
+    	fileChooser.setFileFilter(filter);
         int returnValue = fileChooser.showOpenDialog(this);
         if( returnValue == JFileChooser.APPROVE_OPTION ){
             file = fileChooser.getSelectedFile();
@@ -904,10 +910,12 @@ public class GraphFrame extends JFrame implements ActionListener{
                     openCore(fileChooser);
                 }
                 else{
-                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请重新尝试保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if(returnValue == JOptionPane.NO_OPTION){
+            	pPanel.setBackground(Color.WHITE);
+                graphicsList.clear();
                 openCore(fileChooser);
             }
 		}
@@ -934,7 +942,7 @@ public class GraphFrame extends JFrame implements ActionListener{
                     file = null;
                 }
                 else{
-                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请手动保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "保存过程中出现异常，保存失败，请重新尝试保存该图片", "提示", JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if(returnValue == JOptionPane.NO_OPTION){

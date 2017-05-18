@@ -1,5 +1,7 @@
 package pers.rush.main;
 
+import java.awt.Toolkit;
+
 import pers.rush.graph.GraphFrame;
 
 /**
