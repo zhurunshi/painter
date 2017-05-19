@@ -51,7 +51,6 @@ public class GraphFrame extends JFrame implements ActionListener{
         pBgColor.addActionListener(this);
         pExit.addActionListener(this);
 		// 添加图标
-//		ImageIcon newIcon = new ImageIcon("resources//images//new.png");
 		ImageIcon newIcon = new ImageIcon(Main.class.getResource("../../../resources/images/new.png"));
 		pNew.setIcon(newIcon);
 		ImageIcon openIcon = new ImageIcon(Main.class.getResource("../../../resources/images/open.png"));
