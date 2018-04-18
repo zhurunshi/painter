@@ -7,6 +7,10 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 
 public class PainterButton extends JButton {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5933591301876521160L;
 	public PainterButton(){
         super();
     }

@@ -6,7 +6,12 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/3.
  */
 public class Line extends Shape {
-    public Line(){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2260339564467857659L;
+
+	public Line(){
         super();
     }
 

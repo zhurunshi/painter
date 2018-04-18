@@ -6,7 +6,11 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/8.
  */
 public class Font extends Shape{
-    public String content; // 文本内容
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6551561040876539658L;
+	public String content; // 文本内容
     public int size = 15; // 初始字号为15
 
     public Font(){}

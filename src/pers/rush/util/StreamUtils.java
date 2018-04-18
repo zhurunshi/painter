@@ -15,14 +15,12 @@ public class StreamUtils {
     public static <T> boolean writeObject(List<T> list, File file)
     {
         T[] array = (T[]) list.toArray();
-        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
-        {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(array);
             out.flush();
             return true;
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -34,17 +32,15 @@ public class StreamUtils {
     public static <E> List<E> readObjectForList(File file)
     {
         E[] object;
-        try(ObjectInputStream out = new ObjectInputStream(new FileInputStream(file)))
+        try (ObjectInputStream out = new ObjectInputStream(new FileInputStream(file)))
         {
             object = (E[]) out.readObject();
             return Arrays.asList(object);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
-        catch (ClassNotFoundException e)
-        {
+        catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;

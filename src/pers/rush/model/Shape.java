@@ -1,9 +1,6 @@
 package pers.rush.model;
 
 import java.awt.*;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -11,6 +8,10 @@ import java.io.Serializable;
  */
 public abstract class Shape implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7288932686050758114L;
 	public int x1;
     public int y1;
     public int x2;

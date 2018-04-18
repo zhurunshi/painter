@@ -7,7 +7,11 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/3.
  */
 public class PainterLabel extends JLabel {
-    public PainterLabel(String text, int horizontalAlignment){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -101411705664101726L;
+	public PainterLabel(String text, int horizontalAlignment){
         super(text, horizontalAlignment);
         setForeground(Color.GRAY);
     }

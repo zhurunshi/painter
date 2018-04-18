@@ -7,7 +7,11 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/2.
  */
 public class PainterRadioButton extends JRadioButton {
-    public PainterRadioButton(){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1215014378128397105L;
+	public PainterRadioButton(){
         super();
     }
     public PainterRadioButton(Icon icon){

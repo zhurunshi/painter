@@ -6,7 +6,11 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/12.
  */
 public class Image extends Shape {
-    private java.awt.Image image;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3588071744051465413L;
+	private java.awt.Image image;
 
     public Image() {
         super();

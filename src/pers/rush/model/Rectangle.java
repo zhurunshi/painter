@@ -6,7 +6,12 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/3.
  */
 public class Rectangle extends Shape {
-    public Rectangle(){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7649227280396787336L;
+
+	public Rectangle(){
     	super();
     }
 

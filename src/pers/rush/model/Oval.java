@@ -6,7 +6,12 @@ import java.awt.*;
  * Created by ZhuRunShi on 2017/5/3.
  */
 public class Oval extends Shape{
-    public Oval(){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9137358095768620815L;
+
+	public Oval(){
         super();
     }
 
